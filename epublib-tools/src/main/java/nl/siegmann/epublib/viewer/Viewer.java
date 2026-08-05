@@ -138,23 +138,22 @@ public class Viewer {
 		final JMenuBar menuBar = new JMenuBar();
 		JMenu fileMenu = new JMenu(getText("File"));
 		menuBar.add(fileMenu);
+		
 		JMenuItem openFileMenuItem = new JMenuItem(getText("Open"));
 		openFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Event.CTRL_MASK));
-		openFileMenuItem.addActionListener(new ActionListener() {
-
+		var fileHandler = new Object() {
 			private File previousDir;
-			
-			public void actionPerformed(ActionEvent e) {
+			void openFile() {
 				JFileChooser fileChooser = createFileChooser(previousDir);
 				int returnVal = fileChooser.showOpenDialog(mainWindow);
-				if(returnVal != JFileChooser.APPROVE_OPTION) {
+				if (returnVal != JFileChooser.APPROVE_OPTION) {
 					return;
 				}
 				File selectedFile = fileChooser.getSelectedFile();
 				if (selectedFile == null) {
 					return;
 				}
-				if (! selectedFile.isDirectory()) {
+				if (!selectedFile.isDirectory()) {
 					previousDir = selectedFile.getParentFile();
 				}
 				try {
@@ -164,29 +163,20 @@ public class Viewer {
 					log.error(e1.getMessage(), e1);
 				}
 			}
-		});
-		fileMenu.add(openFileMenuItem);
-
-		JMenuItem saveFileMenuItem = new JMenuItem(getText("Save as ..."));
-		saveFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Event.CTRL_MASK | Event.SHIFT_MASK));
-		saveFileMenuItem.addActionListener(new ActionListener() {
-
-			private File previousDir;
-			
-			public void actionPerformed(ActionEvent e) {
+			void saveFile() {
 				if (navigator.getBook() == null) {
 					return;
 				}
 				JFileChooser fileChooser = createFileChooser(previousDir);
-				int returnVal = fileChooser.showOpenDialog(mainWindow);
-				if(returnVal != JFileChooser.APPROVE_OPTION) {
+				int returnVal = fileChooser.showSaveDialog(mainWindow);
+				if (returnVal != JFileChooser.APPROVE_OPTION) {
 					return;
 				}
 				File selectedFile = fileChooser.getSelectedFile();
 				if (selectedFile == null) {
 					return;
 				}
-				if (! selectedFile.isDirectory()) {
+				if (!selectedFile.isDirectory()) {
 					previousDir = selectedFile.getParentFile();
 				}
 				try {
@@ -195,27 +185,24 @@ public class Viewer {
 					log.error(e1.getMessage(), e1);
 				}
 			}
-		});
+		};
+
+		openFileMenuItem.addActionListener(e -> fileHandler.openFile());
+		fileMenu.add(openFileMenuItem);
+
+		JMenuItem saveFileMenuItem = new JMenuItem(getText("Save as ..."));
+		saveFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Event.CTRL_MASK | Event.SHIFT_MASK));
+		saveFileMenuItem.addActionListener(e -> fileHandler.saveFile());
 		fileMenu.add(saveFileMenuItem);
 		
 		JMenuItem reloadMenuItem = new JMenuItem(getText("Reload"));
 		reloadMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Event.CTRL_MASK));
-		reloadMenuItem.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				gotoBook(navigator.getBook());
-			}
-		});
+		reloadMenuItem.addActionListener(e -> gotoBook(navigator.getBook()));
 		fileMenu.add(reloadMenuItem);
 
 		JMenuItem exitMenuItem = new JMenuItem(getText("Exit"));
 		exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Event.CTRL_MASK));
-		exitMenuItem.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				System.exit(0);
-			}
-		});
+		exitMenuItem.addActionListener(e -> System.exit(0));
 		fileMenu.add(exitMenuItem);
 		
 		JMenu viewMenu = new JMenu(getText("View"));
@@ -223,43 +210,23 @@ public class Viewer {
 		
 		JMenuItem viewTocContentMenuItem = new JMenuItem(getText("TOCContent"), ViewerUtil.createImageIcon("layout-toc-content"));
 		viewTocContentMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_2, Event.CTRL_MASK));
-		viewTocContentMenuItem.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				setLayout(Layout.TocContent);
-			}
-		});
+		viewTocContentMenuItem.addActionListener(e -> setLayout(Layout.TocContent));
 		viewMenu.add(viewTocContentMenuItem);
 
 		JMenuItem viewContentMenuItem = new JMenuItem(getText("Content"), ViewerUtil.createImageIcon("layout-content"));
 		viewContentMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, Event.CTRL_MASK));
-		viewContentMenuItem.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				setLayout(Layout.Content);
-			}
-		});
+		viewContentMenuItem.addActionListener(e -> setLayout(Layout.Content));
 		viewMenu.add(viewContentMenuItem);
 
 		JMenuItem viewTocContentMetaMenuItem = new JMenuItem(getText("TocContentMeta"), ViewerUtil.createImageIcon("layout-toc-content-meta"));
 		viewTocContentMetaMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_3, Event.CTRL_MASK));
-		viewTocContentMetaMenuItem.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				setLayout(Layout.TocContentMeta);
-			}
-		});
+		viewTocContentMetaMenuItem.addActionListener(e -> setLayout(Layout.TocContentMeta));
 		viewMenu.add(viewTocContentMetaMenuItem);
 		
 		JMenu helpMenu = new JMenu(getText("Help"));
 		menuBar.add(helpMenu);
 		JMenuItem aboutMenuItem = new JMenuItem(getText("About"));
-		aboutMenuItem.addActionListener(new ActionListener() {
-
-			public void actionPerformed(ActionEvent e) {
-				new AboutDialog(Viewer.this.mainWindow);
-			}
-		});
+		aboutMenuItem.addActionListener(e -> new AboutDialog(Viewer.this.mainWindow));
 		helpMenu.add(aboutMenuItem);
 
 		return menuBar;
@@ -271,47 +238,31 @@ public class Viewer {
 		Content
 	}
 
-	private class LayoutX {
-		private boolean tocPaneVisible;
-		private boolean contentPaneVisible;
-		private boolean metaPaneVisible;
-		
-	}
 	private void setLayout(Layout layout) {
 		switch (layout) {
-			case Content:
+			case Content -> {
 				mainSplitPane.setDividerLocation(0.0d);
 				rightSplitPane.setDividerLocation(1.0d);
-				break;
-			case TocContent:
+			}
+			case TocContent -> {
 				mainSplitPane.setDividerLocation(0.2d);
 				rightSplitPane.setDividerLocation(1.0d);
-				break;
-			case TocContentMeta:
+			}
+			case TocContentMeta -> {
 				mainSplitPane.setDividerLocation(0.2d);
 				rightSplitPane.setDividerLocation(0.6d);
-				break;
+			}
 		}
 	}
 
 	private static InputStream getBookInputStream(String[] args) {
-		// jquery-fundamentals-book.epub
-//		final Book book = (new EpubReader()).readEpub(new FileInputStream("/home/paul/test2_book1.epub"));
-//		final Book book = (new EpubReader()).readEpub(new FileInputStream("/home/paul/three_men_in_a_boat_jerome_k_jerome.epub"));
-		
-//		String bookFile = "/home/paul/test2_book1.epub";
-//		bookFile = "/home/paul/project/private/library/epub/this_dynamic_earth-AAH813.epub";
-	
-		String bookFile = null;
-		if (args.length > 0) {
-			bookFile = args[0];
-		}
+		String bookFile = (args.length > 0) ? args[0] : null;
 		InputStream result = null;
-		if (! StringUtils.isBlank(bookFile)) {
+		if (!StringUtils.isBlank(bookFile)) {
 			try {
 				result = new FileInputStream(bookFile);
 			} catch (Exception e) {
-				log.error("Unable to open " + bookFile, e);
+				log.error("Unable to open {}", bookFile, e);
 			}
 		}
 		if (result == null) {
@@ -319,9 +270,8 @@ public class Viewer {
 		}
 		return result;
 	}
-	
 
-    public static void main(String[] args) throws FileNotFoundException, IOException {
+	public static void main(String[] args) throws FileNotFoundException, IOException {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {
@@ -329,14 +279,7 @@ public class Viewer {
 		}
 
 		final InputStream bookStream = getBookInputStream(args);
-//		final Book book = readBook(args);
 		
-		// Schedule a job for the event dispatch thread:
-		// creating and showing this application's GUI.
-		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				new Viewer(bookStream);
-			}
-		});
+		javax.swing.SwingUtilities.invokeLater(() -> new Viewer(bookStream));
 	}
 }

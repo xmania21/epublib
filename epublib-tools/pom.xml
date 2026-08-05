@@ -44,6 +44,11 @@
 			<artifactId>commons-lang</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.17.2</version>
+		</dependency>
+		<dependency>
 		    <groupId>net.sf.kxml</groupId>
 		    <artifactId>kxml2</artifactId>
 		</dependency>

@@ -59,6 +59,16 @@ public class PackageDocumentReader extends PackageDocumentBase {
 		if (book.getCoverPage() == null && book.getSpine().size() > 0) {
 			book.setCoverPage(book.getSpine().getResource(0));
 		}
+
+		if (book.getTableOfContents().getTocReferences().isEmpty()) {
+			Resource navResource = resources.getByIdOrHref("nav");
+			if (navResource == null) {
+				navResource = resources.getByHref("nav.xhtml");
+			}
+			if (navResource != null) {
+				Epub3NavReader.readNav(navResource, epubReader, book, resources);
+			}
+		}
 	}
 	
 	/**

@@ -48,6 +48,10 @@ public class TableOfContents implements Serializable {
 		this.tocReferences = tocReferences;
 	}
 	
+	public boolean isEmpty() {
+		return tocReferences == null || tocReferences.isEmpty();
+	}
+	
 	/**
 	 * Calls addTOCReferenceAtLocation after splitting the path using the DEFAULT_PATH_SEPARATOR.
 	 * @return the new TOCReference
