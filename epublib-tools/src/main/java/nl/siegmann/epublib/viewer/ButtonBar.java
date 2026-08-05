@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
 import nl.siegmann.epublib.browsersupport.Navigator;
@@ -26,7 +27,7 @@ class ButtonBar extends JPanel {
 	private final ValueHolder<Navigator> navigatorHolder = new ValueHolder<Navigator>();
 	
 	public ButtonBar(Navigator navigator, ContentPane chapterPane) {
-		super(new GridLayout(0, 4));
+		super(new GridLayout(0, 5));
 		this.chapterPane = chapterPane;
 		
 		JPanel bigPrevious = new JPanel(new GridLayout(0, 2));
@@ -41,6 +42,17 @@ class ButtonBar extends JPanel {
 		bigNext.add(nextChapterButton);
 		bigNext.add(endButton);
 		add(bigNext);
+
+		JComboBox<ViewerTheme> themeBox = new JComboBox<>(ViewerTheme.values());
+		themeBox.setToolTipText("Select UI & Reader Theme");
+		themeBox.addActionListener(e -> {
+			ViewerTheme selectedTheme = (ViewerTheme) themeBox.getSelectedItem();
+			if (selectedTheme != null && chapterPane != null) {
+				chapterPane.applyTheme(selectedTheme);
+				selectedTheme.setupLaf();
+			}
+		});
+		add(themeBox);
 		
 		setSectionWalker(navigator);
 	}

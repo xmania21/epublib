@@ -94,7 +94,6 @@ public class PackageDocumentReaderTest {
 		// given
 		String tocResourceId = "foo";
 		Resources resources = mock(Resources.class);
-		Resource resource = mock(Resource.class);
 		when(resources.getByIdOrHref(Mockito.anyString())).thenReturn(null);
 		when(resources.findFirstResourceByMediaType(MediatypeService.NCX)).thenReturn(null);
 

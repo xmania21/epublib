@@ -1,6 +1,5 @@
 package nl.siegmann.epublib.epub;
 
-import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 import nl.siegmann.epublib.domain.LazyResource;

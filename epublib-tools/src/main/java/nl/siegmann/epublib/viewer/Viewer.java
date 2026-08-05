@@ -2,9 +2,7 @@ package nl.siegmann.epublib.viewer;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Event;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,12 +12,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
@@ -46,6 +46,8 @@ public class Viewer {
 	private JSplitPane mainSplitPane; 
 	private JSplitPane leftSplitPane;
 	private JSplitPane rightSplitPane;
+	private ContentPane htmlPane;
+	private ViewerTheme currentTheme = ViewerTheme.LIGHT;
 	private Navigator navigator = new Navigator();
 	private NavigationHistory browserHistory;
 	private BookProcessorPipeline epubCleaner = new BookProcessorPipeline(Collections.<BookProcessor>emptyList());
@@ -64,6 +66,17 @@ public class Viewer {
 	public Viewer(Book book) {
 		mainWindow = createMainWindow();
 		gotoBook(book);
+	}
+
+	public void setTheme(ViewerTheme theme) {
+		if (theme == null) {
+			return;
+		}
+		this.currentTheme = theme;
+		theme.setupLaf();
+		if (htmlPane != null) {
+			htmlPane.applyTheme(theme);
+		}
 	}
 
 	private JFrame createMainWindow() {
@@ -85,7 +98,7 @@ public class Viewer {
 		rightSplitPane.setOneTouchExpandable(true);
 		rightSplitPane.setContinuousLayout(true);
 		rightSplitPane.setResizeWeight(1.0);
-		ContentPane htmlPane = new ContentPane(navigator);
+		this.htmlPane = new ContentPane(navigator);
 		JPanel contentPanel = new JPanel(new BorderLayout());
 		contentPanel.add(htmlPane, BorderLayout.CENTER);
 		this.browseBar = new BrowseBar(navigator, htmlPane);
@@ -108,10 +121,14 @@ public class Viewer {
 		result.pack();
 		setLayout(Layout.TocContentMeta);
 		result.setVisible(true);
-		return result;	}
+		return result;
+	}
 	
 	
 	private void gotoBook(Book book) {
+		if (book == null) {
+			return;
+		}
 		mainWindow.setTitle(book.getTitle());
 		navigator.gotoBook(book, this);
 	}
@@ -140,7 +157,7 @@ public class Viewer {
 		menuBar.add(fileMenu);
 		
 		JMenuItem openFileMenuItem = new JMenuItem(getText("Open"));
-		openFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Event.CTRL_MASK));
+		openFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK));
 		var fileHandler = new Object() {
 			private File previousDir;
 			void openFile() {
@@ -191,17 +208,17 @@ public class Viewer {
 		fileMenu.add(openFileMenuItem);
 
 		JMenuItem saveFileMenuItem = new JMenuItem(getText("Save as ..."));
-		saveFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Event.CTRL_MASK | Event.SHIFT_MASK));
+		saveFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
 		saveFileMenuItem.addActionListener(e -> fileHandler.saveFile());
 		fileMenu.add(saveFileMenuItem);
 		
 		JMenuItem reloadMenuItem = new JMenuItem(getText("Reload"));
-		reloadMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Event.CTRL_MASK));
+		reloadMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK));
 		reloadMenuItem.addActionListener(e -> gotoBook(navigator.getBook()));
 		fileMenu.add(reloadMenuItem);
 
 		JMenuItem exitMenuItem = new JMenuItem(getText("Exit"));
-		exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Event.CTRL_MASK));
+		exitMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_DOWN_MASK));
 		exitMenuItem.addActionListener(e -> System.exit(0));
 		fileMenu.add(exitMenuItem);
 		
@@ -209,19 +226,31 @@ public class Viewer {
 		menuBar.add(viewMenu);
 		
 		JMenuItem viewTocContentMenuItem = new JMenuItem(getText("TOCContent"), ViewerUtil.createImageIcon("layout-toc-content"));
-		viewTocContentMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_2, Event.CTRL_MASK));
+		viewTocContentMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_2, InputEvent.CTRL_DOWN_MASK));
 		viewTocContentMenuItem.addActionListener(e -> setLayout(Layout.TocContent));
 		viewMenu.add(viewTocContentMenuItem);
 
 		JMenuItem viewContentMenuItem = new JMenuItem(getText("Content"), ViewerUtil.createImageIcon("layout-content"));
-		viewContentMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, Event.CTRL_MASK));
+		viewContentMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1, InputEvent.CTRL_DOWN_MASK));
 		viewContentMenuItem.addActionListener(e -> setLayout(Layout.Content));
 		viewMenu.add(viewContentMenuItem);
 
 		JMenuItem viewTocContentMetaMenuItem = new JMenuItem(getText("TocContentMeta"), ViewerUtil.createImageIcon("layout-toc-content-meta"));
-		viewTocContentMetaMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_3, Event.CTRL_MASK));
+		viewTocContentMetaMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_3, InputEvent.CTRL_DOWN_MASK));
 		viewTocContentMetaMenuItem.addActionListener(e -> setLayout(Layout.TocContentMeta));
 		viewMenu.add(viewTocContentMetaMenuItem);
+
+		viewMenu.addSeparator();
+
+		JMenu themeMenu = new JMenu(getText("Theme"));
+		ButtonGroup themeGroup = new ButtonGroup();
+		for (ViewerTheme theme : ViewerTheme.values()) {
+			JRadioButtonMenuItem themeItem = new JRadioButtonMenuItem(theme.getDisplayName(), theme == currentTheme);
+			themeItem.addActionListener(e -> setTheme(theme));
+			themeGroup.add(themeItem);
+			themeMenu.add(themeItem);
+		}
+		viewMenu.add(themeMenu);
 		
 		JMenu helpMenu = new JMenu(getText("Help"));
 		menuBar.add(helpMenu);
@@ -273,9 +302,13 @@ public class Viewer {
 
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			com.formdev.flatlaf.FlatLightLaf.setup();
 		} catch (Exception e) {
-			log.error("Unable to set native look and feel", e);
+			try {
+				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+			} catch (Exception ex) {
+				log.error("Unable to set look and feel", ex);
+			}
 		}
 
 		final InputStream bookStream = getBookInputStream(args);

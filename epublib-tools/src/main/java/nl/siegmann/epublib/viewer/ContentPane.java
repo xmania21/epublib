@@ -22,6 +22,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
 
 import nl.siegmann.epublib.Constants;
 import nl.siegmann.epublib.browsersupport.NavigationEvent;
@@ -51,6 +52,7 @@ public class ContentPane extends JPanel implements NavigationEventListener,
 	private JEditorPane editorPane;
 	private JScrollPane scrollPane;
 	private HTMLDocumentFactory htmlDocumentFactory;
+	private ViewerTheme currentTheme = ViewerTheme.LIGHT;
 	
 	public ContentPane(Navigator navigator) {
 		super(new GridLayout(1, 0));
@@ -164,10 +166,11 @@ public class ContentPane extends JPanel implements NavigationEventListener,
 	 */
 	private static void scrollToElement(JEditorPane editorPane, HTMLDocument.Iterator elementIterator) {
 		try {
-			Rectangle rectangle = editorPane.modelToView(elementIterator.getStartOffset());
-			if (rectangle == null) {
+			java.awt.geom.Rectangle2D rect2D = editorPane.modelToView2D(elementIterator.getStartOffset());
+			if (rect2D == null) {
 				return;
 			}
+			Rectangle rectangle = rect2D.getBounds();
 			// the view is visible, scroll it to the
 			// center of the current visible area.
 			Rectangle visibleRectangle = editorPane.getVisibleRect();
@@ -199,15 +202,11 @@ public class ContentPane extends JPanel implements NavigationEventListener,
 
 	private JEditorPane createJEditorPane() {
 		JEditorPane editorPane = new JEditorPane();
-		editorPane.setBackground(Color.white);
+		editorPane.setBackground(currentTheme.getBackgroundColor());
+		editorPane.setForeground(currentTheme.getTextColor());
+		editorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 		editorPane.setEditable(false);
 		HTMLEditorKit htmlKit = new HTMLEditorKit();
-		// StyleSheet myStyleSheet = new StyleSheet();
-		// String normalTextStyle = "font-size: 12px, font-family: georgia";
-		// myStyleSheet.addRule("body {" + normalTextStyle + "}");
-		// myStyleSheet.addRule("p {" + normalTextStyle + "}");
-		// myStyleSheet.addRule("div {" + normalTextStyle + "}");
-		// htmlKit.setStyleSheet(myStyleSheet);
 		editorPane.setEditorKit(htmlKit);
 		editorPane.addHyperlinkListener(this);
 		editorPane.addKeyListener(new KeyListener() {
@@ -218,8 +217,6 @@ public class ContentPane extends JPanel implements NavigationEventListener,
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				// TODO Auto-generated method stub
-
 			}
 
 			@Override
@@ -228,15 +225,39 @@ public class ContentPane extends JPanel implements NavigationEventListener,
 					navigator.gotoNextSpineSection(ContentPane.this);
 				} else if (keyEvent.getKeyCode() == KeyEvent.VK_LEFT) {
 					navigator.gotoPreviousSpineSection(ContentPane.this);
-//				} else if (keyEvent.getKeyCode() == KeyEvent.VK_UP) {
-//					ContentPane.this.gotoPreviousPage();
 				} else if (keyEvent.getKeyCode() == KeyEvent.VK_SPACE) {
-//					|| (keyEvent.getKeyCode() == KeyEvent.VK_DOWN)) {
 					ContentPane.this.gotoNextPage();
 				}
 			}
 		});
 		return editorPane;
+	}
+
+	public void applyTheme(ViewerTheme theme) {
+		if (theme == null) {
+			return;
+		}
+		this.currentTheme = theme;
+		if (editorPane != null) {
+			editorPane.setBackground(theme.getBackgroundColor());
+			editorPane.setForeground(theme.getTextColor());
+			editorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+			
+			HTMLEditorKit htmlKit = (HTMLEditorKit) editorPane.getEditorKit();
+			if (htmlKit != null) {
+				StyleSheet styleSheet = htmlKit.getStyleSheet();
+				styleSheet.addRule("body { background-color: " + theme.getBgHex() + "; color: " + theme.getTextHex() + "; }");
+				styleSheet.addRule("a { color: " + theme.getLinkHex() + "; }");
+			}
+
+			if (editorPane.getDocument() instanceof HTMLDocument htmlDoc) {
+				StyleSheet docStyleSheet = htmlDoc.getStyleSheet();
+				docStyleSheet.addRule("body { background-color: " + theme.getBgHex() + "; color: " + theme.getTextHex() + "; }");
+				docStyleSheet.addRule("a { color: " + theme.getLinkHex() + "; }");
+			}
+
+			editorPane.repaint();
+		}
 	}
 
 	public void displayPage(Resource resource) {
@@ -254,6 +275,7 @@ public class ContentPane extends JPanel implements NavigationEventListener,
 			}
 			currentResource = resource;
 			editorPane.setDocument(document);
+			applyTheme(currentTheme);
 			scrollToCurrentPosition(sectionPos);
 		} catch (Exception e) {
 			log.error("When reading resource " + resource.getId() + "("

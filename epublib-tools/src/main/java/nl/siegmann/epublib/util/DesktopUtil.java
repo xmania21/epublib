@@ -1,12 +1,7 @@
-
 package nl.siegmann.epublib.util;
 
 import java.awt.Desktop;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.logging.Level;
-import nl.siegmann.epublib.viewer.ContentPane;
 
 public class DesktopUtil {
     

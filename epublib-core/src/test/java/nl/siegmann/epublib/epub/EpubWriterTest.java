@@ -1,10 +1,5 @@
 package nl.siegmann.epublib.epub;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -133,24 +128,4 @@ public class EpubWriterTest {
 //	            book.getMetadata().addContributor(contributor);
 //	        }
 //	       
-//	       
-//	        book.setCoverImage(coverImg);
-//	        for(BookChapterDTO chapter : dto.getChapters()){
-//	            Resource aux = new Resource(HTMLGenerator.generateChapterHtmlStream(dto,chapter), "chapter"+chapter.getNumber()+".html");
-//	            book.addSection(chapter.getTitle(), aux );
-//	        }
-//	       
-//	        EpubWriter writer = new EpubWriter();
-//	        FileOutputStream output = new FileOutputStream(ResourceBundle.getBundle("info.pxdev.pfi.webclient.resources.Config").getString("HTML_CHAPTERS")+dto.getId_book()+"\\test.epub");
-//	       
-//	        try {
-//	            writer.write(book, output);
-//	        } catch (XMLStreamException e) {
-//	            // TODO Auto-generated catch block
-//	            e.printStackTrace();
-//	        } catch (FactoryConfigurationError e) {
-//	            // TODO Auto-generated catch block
-//	            e.printStackTrace();
-//	        }
-//	    }
 }

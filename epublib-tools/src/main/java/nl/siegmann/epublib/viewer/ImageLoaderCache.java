@@ -72,7 +72,7 @@ class ImageLoaderCache extends Dictionary<String, Image> {
 
 	public void initImageLoader(HTMLDocument document) {
 		try {
-			document.setBase(new URL(ImageLoaderCache.IMAGE_URL_PREFIX));
+			document.setBase(java.net.URI.create(ImageLoaderCache.IMAGE_URL_PREFIX).toURL());
 		} catch (MalformedURLException e) {
 			log.error(e.getMessage());
 		}

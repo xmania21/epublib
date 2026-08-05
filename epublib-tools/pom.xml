@@ -49,6 +49,11 @@
 			<version>1.17.2</version>
 		</dependency>
 		<dependency>
+			<groupId>com.formdev</groupId>
+			<artifactId>flatlaf</artifactId>
+			<version>3.4.1</version>
+		</dependency>
+		<dependency>
 		    <groupId>net.sf.kxml</groupId>
 		    <artifactId>kxml2</artifactId>
 		</dependency>

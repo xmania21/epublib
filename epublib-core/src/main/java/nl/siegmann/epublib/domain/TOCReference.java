@@ -1,6 +1,5 @@
 package nl.siegmann.epublib.domain;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -13,7 +12,7 @@ import java.util.List;
  * @author paul
  *
  */
-public class TOCReference extends TitledResourceReference implements Serializable {
+public class TOCReference extends TitledResourceReference {
 
 	/**
 	 * 
