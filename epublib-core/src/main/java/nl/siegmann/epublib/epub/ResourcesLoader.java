@@ -1,6 +1,7 @@
 package nl.siegmann.epublib.epub;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -47,30 +48,41 @@ public class ResourcesLoader {
 			List<MediaType> lazyLoadedTypes) throws IOException {		
 				
 		Resources result = new Resources();
-		Enumeration<? extends ZipEntry> entries = zipFile.entries();
+		List<? extends ZipEntry> entryList = Collections.list(zipFile.entries());
 
-		while (entries.hasMoreElements()) {
-			ZipEntry zipEntry = entries.nextElement();
+		try (var executor = java.util.concurrent.Executors.newVirtualThreadPerTaskExecutor()) {
+			List<java.util.concurrent.Future<Resource>> futures = new ArrayList<>();
 
-			if (zipEntry == null || zipEntry.isDirectory()) {
-				continue;
+			for (ZipEntry zipEntry : entryList) {
+				if (zipEntry == null || zipEntry.isDirectory()) {
+					continue;
+				}
+				String href = zipEntry.getName();
+				futures.add(executor.submit(() -> {
+					Resource resource;
+					if (shouldLoadLazy(href, lazyLoadedTypes)) {
+						resource = new LazyResource(zipFile.getName(), zipEntry.getSize(), href);
+					} else {
+						try (var in = zipFile.getInputStream(zipEntry)) {
+							resource = ResourceUtil.createResource(zipEntry, in);
+						}
+					}
+					if (resource.getMediaType() == MediatypeService.XHTML) {
+						resource.setInputEncoding(defaultHtmlEncoding);
+					}
+					return resource;
+				}));
 			}
-			
-			String href = zipEntry.getName();
-			Resource resource;
-			
-			if (shouldLoadLazy(href, lazyLoadedTypes)) {
-				resource = new LazyResource(zipFile.getName(), zipEntry.getSize(), href);								
-			} else {		
-				resource = ResourceUtil.createResource(zipEntry, zipFile.getInputStream(zipEntry));
+
+			for (var future : futures) {
+				try {
+					result.add(future.get());
+				} catch (Exception e) {
+					LOG.error("Error reading zip entry concurrently", e);
+				}
 			}
-			
-			if (resource.getMediaType() == MediatypeService.XHTML) {
-				resource.setInputEncoding(defaultHtmlEncoding);
-			}
-			result.add(resource);
 		}
-		
+
 		return result;
 	}
 	
