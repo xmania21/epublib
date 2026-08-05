@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html","k":"18"},{"l":"nl.siegmann.epublib.util"},{"l":"nl.siegmann.epublib.viewer"}];updateSearchResults();
