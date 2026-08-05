@@ -43,9 +43,10 @@
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
+			<artifactId>mockito-core</artifactId>
 			<scope>test</scope>
 		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -72,8 +73,7 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
-					<source>${source.version}</source>
-					<target>${target.version}</target>
+					<release>${maven.compiler.release}</release>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -90,7 +90,7 @@
 	<repositories>
 		<repository>
 			<id>maven</id>
-			<url>http://repo1.maven.org/maven2/</url>
+			<url>https://repo1.maven.org/maven2/</url>
 		</repository>
 		<repository>
 			<id>jboss</id>
@@ -99,7 +99,7 @@
 		<repository>
 			<id>net.java.repository</id>
 			<name>Java.net repository</name>
-			<url>http://download.java.net/maven/2/</url>
+			<url>https://download.java.net/maven/2/</url>
 		</repository>
 	</repositories>
 </project>
