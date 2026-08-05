@@ -215,4 +215,21 @@ public class Metadata implements Serializable {
 	public void setMetaAttributes(Map<String, String> metaAttributes) {
 		this.metaAttributes = metaAttributes;
 	}
+
+	public RenditionLayout getRenditionLayout() {
+		for (Map.Entry<javax.xml.namespace.QName, String> entry : otherProperties.entrySet()) {
+			if ("rendition:layout".equalsIgnoreCase(entry.getKey().getLocalPart())) {
+				return RenditionLayout.fromValue(entry.getValue());
+			}
+		}
+		return null;
+	}
+
+	public void setRenditionLayout(RenditionLayout layout) {
+		if (layout == null) {
+			otherProperties.entrySet().removeIf(e -> "rendition:layout".equalsIgnoreCase(e.getKey().getLocalPart()));
+		} else {
+			otherProperties.put(new javax.xml.namespace.QName("rendition:layout"), layout.getValue());
+		}
+	}
 }

@@ -78,8 +78,44 @@ public class EpubWriter {
 	
 
 	private void writeResources(Book book, ZipOutputStream resultStream) throws IOException {
-		for(Resource resource: book.getResources().getAll()) {
-			writeResource(resource, resultStream);
+		java.util.Collection<Resource> resources = book.getResources().getAll();
+		java.util.Map<String, byte[]> resourceDataMap = new java.util.concurrent.ConcurrentHashMap<>();
+
+		try (var executor = java.util.concurrent.Executors.newVirtualThreadPerTaskExecutor()) {
+			java.util.List<java.util.concurrent.Future<?>> futures = new java.util.ArrayList<>();
+			for (Resource resource : resources) {
+				if (resource == null) continue;
+				futures.add(executor.submit(() -> {
+					try (InputStream is = resource.getInputStream()) {
+						byte[] data = IOUtil.toByteArray(is);
+						resourceDataMap.put(resource.getHref(), data);
+					} catch (Exception e) {
+						log.error("Failed to read resource " + resource.getHref() + " for writing", e);
+					}
+				}));
+			}
+			for (var future : futures) {
+				try {
+					future.get();
+				} catch (Exception e) {
+					log.error("Error fetching resource data concurrently", e);
+				}
+			}
+		}
+
+		for (Resource resource : resources) {
+			if (resource == null) continue;
+			byte[] data = resourceDataMap.get(resource.getHref());
+			if (data != null) {
+				try {
+					resultStream.putNextEntry(new ZipEntry("OEBPS/" + resource.getHref()));
+					resultStream.write(data);
+				} catch (Exception e) {
+					log.error(e.getMessage(), e);
+				}
+			} else {
+				writeResource(resource, resultStream);
+			}
 		}
 	}
 

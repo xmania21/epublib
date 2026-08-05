@@ -113,28 +113,29 @@ public class SearchIndex {
 		if (resource.getMediaType() != MediatypeService.XHTML) {
 			return "";
 		}
-		String result = "";
 		try {
-			result = getSearchContent(resource.getReader());
+			String html = new String(resource.getData(), resource.getInputEncoding());
+			org.jsoup.nodes.Document doc = org.jsoup.Jsoup.parse(html);
+			return cleanText(doc.text());
 		} catch (IOException e) {
-			log.error(e.getMessage());
+			log.error(e.getMessage(), e);
+			return "";
 		}
-		return result;
 	}
-	
-	
+
 	public static String getSearchContent(Reader content) {
 		StringBuilder result = new StringBuilder();
 		Scanner scanner = new Scanner(content);
 		scanner.useDelimiter("<");
-		while(scanner.hasNext()) {
+		while (scanner.hasNext()) {
 			String text = scanner.next();
 			int closePos = text.indexOf('>');
 			String chunk = text.substring(closePos + 1).trim();
-			chunk = StringEscapeUtils.unescapeHtml(chunk);
+			chunk = org.apache.commons.lang.StringEscapeUtils.unescapeHtml(chunk);
 			chunk = cleanText(chunk);
 			result.append(chunk);
 		}
+		scanner.close();
 		return result.toString();
 	}
 	
