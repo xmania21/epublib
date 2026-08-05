@@ -1,7 +1,7 @@
 package nl.siegmann.epublib.util;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -16,7 +16,7 @@ public class NoCloseOutputStreamTest {
 
 	private NoCloseOutputStream noCloseOutputStream;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 		this.noCloseOutputStream = new NoCloseOutputStream(outputStream);

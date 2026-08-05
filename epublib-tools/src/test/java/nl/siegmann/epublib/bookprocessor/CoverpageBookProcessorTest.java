@@ -1,9 +1,11 @@
 package nl.siegmann.epublib.bookprocessor;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-public class CoverpageBookProcessorTest extends TestCase {
+public class CoverpageBookProcessorTest {
 
+	@Test
 	public void testCalculateAbsoluteImageHref1() {
 		String[] testData = new String[] {
 				"/foo/index.html", "bar.html", "/foo/bar.html",
@@ -12,7 +14,7 @@ public class CoverpageBookProcessorTest extends TestCase {
 		};
 		for (int i = 0; i < testData.length; i+= 3) {
 			String actualResult = CoverpageBookProcessor.calculateAbsoluteImageHref(testData[i + 1], testData[i]);
-			assertEquals(testData[i + 2], actualResult);
+			Assertions.assertEquals(testData[i + 2], actualResult);
 		}
 	}
 

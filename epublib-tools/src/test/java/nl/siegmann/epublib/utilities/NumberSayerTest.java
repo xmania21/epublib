@@ -1,8 +1,10 @@
 package nl.siegmann.epublib.utilities;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-public class NumberSayerTest extends TestCase {
+public class NumberSayerTest {
+	@Test
 	public void test1() {
 		Object[] testinput = new Object[] {
 			1, "one",
@@ -10,8 +12,8 @@ public class NumberSayerTest extends TestCase {
 			127, "hundredtwentyseven",
 			433, "fourhundredthirtythree"
 		};
-		for(int i = 0; i < testinput.length; i += 2) {
-			assertEquals((String) testinput[i + 1], NumberSayer.getNumberName((Integer) testinput[i])); 
+		for (int i = 0; i < testinput.length; i += 2) {
+			Assertions.assertEquals((String) testinput[i + 1], NumberSayer.getNumberName((Integer) testinput[i])); 
 		}
 	}
 }

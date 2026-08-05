@@ -2,15 +2,17 @@ package nl.siegmann.epublib.html.htmlcleaner;
 
 import java.io.IOException;
 
-import junit.framework.TestCase;
 import nl.siegmann.epublib.Constants;
 import nl.siegmann.epublib.bookprocessor.HtmlCleanerBookProcessor;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.service.MediatypeService;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-public class HtmlCleanerBookProcessorTest extends TestCase {
+public class HtmlCleanerBookProcessorTest {
 
+	@Test
 	public void testSimpleDocument1() {
 		Book book = new Book();
 		String testInput = "<html><head><title>title</title></head><body>Hello, world!</html>";
@@ -21,12 +23,13 @@ public class HtmlCleanerBookProcessorTest extends TestCase {
 			HtmlCleanerBookProcessor htmlCleanerBookProcessor = new HtmlCleanerBookProcessor();
 			byte[] processedHtml = htmlCleanerBookProcessor.processHtml(resource, book, Constants.CHARACTER_ENCODING);
 			String actualResult = new String(processedHtml, Constants.CHARACTER_ENCODING);
-			assertEquals(expectedResult, actualResult);
+			Assertions.assertEquals(expectedResult, actualResult);
 		} catch (IOException e) {
-			assertTrue(e.getMessage(), false);
+			Assertions.fail(e.getMessage());
 		}
 	}
 	
+	@Test
 	public void testSimpleDocument2() {
 		Book book = new Book();
 		String testInput = "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>test page</title><link foo=\"bar\" /></head><body background=\"red\">Hello, world!</body></html>";
@@ -36,12 +39,13 @@ public class HtmlCleanerBookProcessorTest extends TestCase {
 			HtmlCleanerBookProcessor htmlCleanerBookProcessor = new HtmlCleanerBookProcessor();
 			byte[] processedHtml = htmlCleanerBookProcessor.processHtml(resource, book, Constants.CHARACTER_ENCODING);
 			String result = new String(processedHtml, Constants.CHARACTER_ENCODING);
-			assertEquals(Constants.DOCTYPE_XHTML + "\n" + testInput, result);
+			Assertions.assertEquals(Constants.DOCTYPE_XHTML + "\n" + testInput, result);
 		} catch (IOException e) {
-			assertTrue(e.getMessage(), false);
+			Assertions.fail(e.getMessage());
 		}
 	}
 	
+	@Test
 	public void testSimpleDocument3() {
 		Book book = new Book();
 		String testInput = "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>test page</title></head><body>Hello, world! ß</body></html>";
@@ -51,12 +55,13 @@ public class HtmlCleanerBookProcessorTest extends TestCase {
 			HtmlCleanerBookProcessor htmlCleanerBookProcessor = new HtmlCleanerBookProcessor();
 			byte[] processedHtml = htmlCleanerBookProcessor.processHtml(resource, book, Constants.CHARACTER_ENCODING);
 			String result = new String(processedHtml, Constants.CHARACTER_ENCODING);
-			assertEquals(Constants.DOCTYPE_XHTML + "\n" + testInput, result);
+			Assertions.assertEquals(Constants.DOCTYPE_XHTML + "\n" + testInput, result);
 		} catch (IOException e) {
-			assertTrue(e.getMessage(), false);
+			Assertions.fail(e.getMessage());
 		}
 	}
 	
+	@Test
 	public void testSimpleDocument4() {
 		Book book = new Book();
 		String testInput = "<html><head><title>title</title></head><body>Hello, world!\nHow are you ?</html>";
@@ -67,13 +72,13 @@ public class HtmlCleanerBookProcessorTest extends TestCase {
 			HtmlCleanerBookProcessor htmlCleanerBookProcessor = new HtmlCleanerBookProcessor();
 			byte[] processedHtml = htmlCleanerBookProcessor.processHtml(resource, book, Constants.CHARACTER_ENCODING);
 			String actualResult = new String(processedHtml, Constants.CHARACTER_ENCODING);
-			assertEquals(expectedResult, actualResult);
+			Assertions.assertEquals(expectedResult, actualResult);
 		} catch (IOException e) {
-			assertTrue(e.getMessage(), false);
+			Assertions.fail(e.getMessage());
 		}
 	}
 
-
+	@Test
 	public void testMetaContentType() {
 		Book book = new Book();
 		String testInput = "<html><head><title>title</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\"/></head><body>Hello, world!</html>";
@@ -84,12 +89,13 @@ public class HtmlCleanerBookProcessorTest extends TestCase {
 			HtmlCleanerBookProcessor htmlCleanerBookProcessor = new HtmlCleanerBookProcessor();
 			byte[] processedHtml = htmlCleanerBookProcessor.processHtml(resource, book, Constants.CHARACTER_ENCODING);
 			String actualResult = new String(processedHtml, Constants.CHARACTER_ENCODING);
-			assertEquals(expectedResult, actualResult);
+			Assertions.assertEquals(expectedResult, actualResult);
 		} catch (IOException e) {
-			assertTrue(e.getMessage(), false);
+			Assertions.fail(e.getMessage());
 		}
 	}
 	
+	@Test
 	public void testDocType1() {
 		Book book = new Book();
 		String testInput = "<html><head><title>title</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\"/></head><body>Hello, world!</html>";
@@ -100,12 +106,13 @@ public class HtmlCleanerBookProcessorTest extends TestCase {
 			HtmlCleanerBookProcessor htmlCleanerBookProcessor = new HtmlCleanerBookProcessor();
 			byte[] processedHtml = htmlCleanerBookProcessor.processHtml(resource, book, Constants.CHARACTER_ENCODING);
 			String actualResult = new String(processedHtml, Constants.CHARACTER_ENCODING);
-			assertEquals(expectedResult, actualResult);
+			Assertions.assertEquals(expectedResult, actualResult);
 		} catch (IOException e) {
-			assertTrue(e.getMessage(), false);
+			Assertions.fail(e.getMessage());
 		}
 	}
 
+	@Test
 	public void testDocType2() {
 		Book book = new Book();
 		String testInput = Constants.DOCTYPE_XHTML + "\n<html><head><title>title</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\"/></head><body>Hello, world!</html>";
@@ -116,12 +123,13 @@ public class HtmlCleanerBookProcessorTest extends TestCase {
 			HtmlCleanerBookProcessor htmlCleanerBookProcessor = new HtmlCleanerBookProcessor();
 			byte[] processedHtml = htmlCleanerBookProcessor.processHtml(resource, book, Constants.CHARACTER_ENCODING);
 			String actualResult = new String(processedHtml, Constants.CHARACTER_ENCODING);
-			assertEquals(expectedResult, actualResult);
+			Assertions.assertEquals(expectedResult, actualResult);
 		} catch (IOException e) {
-			assertTrue(e.getMessage(), false);
+			Assertions.fail(e.getMessage());
 		}
 	}
 
+	@Test
 	public void testXmlNS() {
 		Book book = new Book();
 		String testInput = "<html><head><title>title</title></head><body xmlns:xml=\"xml\">Hello, world!</html>";
@@ -132,11 +140,13 @@ public class HtmlCleanerBookProcessorTest extends TestCase {
 			HtmlCleanerBookProcessor htmlCleanerBookProcessor = new HtmlCleanerBookProcessor();
 			byte[] processedHtml = htmlCleanerBookProcessor.processHtml(resource, book, Constants.CHARACTER_ENCODING);
 			String actualResult = new String(processedHtml, Constants.CHARACTER_ENCODING);
-			assertEquals(expectedResult, actualResult);
+			Assertions.assertEquals(expectedResult, actualResult);
 		} catch (IOException e) {
-			assertTrue(e.getMessage(), false);
+			Assertions.fail(e.getMessage());
 		}
 	}
+
+	@Test
 	public void testApos() {
 		Book book = new Book();
 		String testInput = "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>test page</title></head><body>'hi'</body></html>";
@@ -146,9 +156,9 @@ public class HtmlCleanerBookProcessorTest extends TestCase {
 			HtmlCleanerBookProcessor htmlCleanerBookProcessor = new HtmlCleanerBookProcessor();
 			byte[] processedHtml = htmlCleanerBookProcessor.processHtml(resource, book, Constants.CHARACTER_ENCODING);
 			String result = new String(processedHtml, Constants.CHARACTER_ENCODING);
-			assertEquals(Constants.DOCTYPE_XHTML + "\n" + testInput, result);
+			Assertions.assertEquals(Constants.DOCTYPE_XHTML + "\n" + testInput, result);
 		} catch (IOException e) {
-			assertTrue(e.getMessage(), false);
+			Assertions.fail(e.getMessage());
 		}
 	}
 }

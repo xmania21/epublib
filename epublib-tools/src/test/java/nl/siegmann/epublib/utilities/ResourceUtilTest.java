@@ -1,12 +1,14 @@
 package nl.siegmann.epublib.utilities;
 
-import junit.framework.TestCase;
 import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.service.MediatypeService;
 import nl.siegmann.epublib.util.ToolsResourceUtil;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-public class ResourceUtilTest extends TestCase {
+public class ResourceUtilTest {
 
+	@Test
 	public void testFindTitle() {
 		String[] testData = new String[] {
 				"<html><title>my title1</title><body><h1>wrong title</h1></body></html>", "my title1",
@@ -19,7 +21,7 @@ public class ResourceUtilTest extends TestCase {
 		for (int i = 0; i < testData.length; i+= 2) {
 			Resource resource = new Resource(testData[i].getBytes(), MediatypeService.XHTML);
 			String actualTitle = ToolsResourceUtil.findTitleFromXhtml(resource);
-			assertEquals(testData[i + 1], actualTitle);
+			Assertions.assertEquals(testData[i + 1], actualTitle);
 		}
 	}
 }

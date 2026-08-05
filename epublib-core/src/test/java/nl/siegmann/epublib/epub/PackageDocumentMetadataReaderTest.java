@@ -1,7 +1,7 @@
 package nl.siegmann.epublib.epub;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -9,8 +9,8 @@ import java.io.StringReader;
 import nl.siegmann.epublib.domain.Identifier;
 import nl.siegmann.epublib.domain.Metadata;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -84,16 +84,16 @@ public class PackageDocumentMetadataReaderTest {
     	Metadata metadata = PackageDocumentMetadataReader.readMetadata(metadataDocument);
     	
     	// then
-    	Assert.assertEquals("Three Men in a Boat", metadata.getFirstTitle());
+    	Assertions.assertEquals("Three Men in a Boat", metadata.getFirstTitle());
 
     	// test identifier
-    	Assert.assertNotNull(metadata.getIdentifiers());
-    	Assert.assertEquals(1, metadata.getIdentifiers().size());
+    	Assertions.assertNotNull(metadata.getIdentifiers());
+    	Assertions.assertEquals(1, metadata.getIdentifiers().size());
     	Identifier identifier = metadata.getIdentifiers().get(0);
-    	Assert.assertEquals("URI", identifier.getScheme());
-    	Assert.assertEquals("zelda@mobileread.com:2010040720", identifier.getValue());
+    	Assertions.assertEquals("URI", identifier.getScheme());
+    	Assertions.assertEquals("zelda@mobileread.com:2010040720", identifier.getValue());
     	
-    	Assert.assertEquals("8", metadata.getMetaAttribute("calibre:rating"));
-    	Assert.assertEquals("cover_pic", metadata.getMetaAttribute("cover"));
+    	Assertions.assertEquals("8", metadata.getMetaAttribute("calibre:rating"));
+    	Assertions.assertEquals("cover_pic", metadata.getMetaAttribute("cover"));
     }
 }

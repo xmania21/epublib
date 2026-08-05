@@ -1,7 +1,7 @@
 package nl.siegmann.epublib.epub;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Resource;
@@ -18,16 +18,16 @@ public class Epub3NavTest {
 		book.addSection("Chapter 1", chapter1);
 		
 		Resource navResource = Epub3NavWriter.createNavResource(book);
-		Assert.assertNotNull(navResource);
-		Assert.assertEquals("nav", navResource.getId());
-		Assert.assertTrue(new String(navResource.getData()).contains("<nav"));
+		Assertions.assertNotNull(navResource);
+		Assertions.assertEquals("nav", navResource.getId());
+		Assertions.assertTrue(new String(navResource.getData()).contains("<nav"));
 		
 		Book readBook = new Book();
 		readBook.getResources().add(chapter1);
 		readBook.setTableOfContents(new TableOfContents());
 		
 		Epub3NavReader.readNav(navResource, new EpubReader(), readBook, readBook.getResources());
-		Assert.assertFalse(readBook.getTableOfContents().isEmpty());
-		Assert.assertEquals("Chapter 1", readBook.getTableOfContents().getTocReferences().get(0).getTitle());
+		Assertions.assertFalse(readBook.getTableOfContents().isEmpty());
+		Assertions.assertEquals("Chapter 1", readBook.getTableOfContents().getTocReferences().get(0).getTitle());
 	}
 }

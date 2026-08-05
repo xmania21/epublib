@@ -2,18 +2,16 @@ package nl.siegmann.epublib.epub;
 
 import java.io.StringReader;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
-
-@RunWith(Enclosed.class)
 public class DOMUtilTest {
 
-	public static class GetAttribute {
+	@Nested
+	public class GetAttribute {
 		
 		@Test
 		public void test_simple_foo() {

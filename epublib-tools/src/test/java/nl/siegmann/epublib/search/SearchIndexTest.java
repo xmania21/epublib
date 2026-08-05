@@ -4,13 +4,15 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 
-import junit.framework.TestCase;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.service.MediatypeService;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-public class SearchIndexTest extends TestCase {
+public class SearchIndexTest {
 
+	@Test
 	public void testDoSearch1() {
 		try {
 			Book testBook = new Book();
@@ -20,18 +22,19 @@ public class SearchIndexTest extends TestCase {
 			testBook.addSection("chapter4", new Resource(new StringReader("aa"), "chapter4.html"));
 			SearchIndex searchIndex = new SearchIndex(testBook);
 			SearchResults searchResults = searchIndex.doSearch("a");
-			assertFalse(searchResults.isEmpty());
-			assertEquals(5, searchResults.size());
-			assertEquals(0, searchResults.getHits().get(0).getPagePos());
-			assertEquals(0, searchResults.getHits().get(1).getPagePos());
-			assertEquals(1, searchResults.getHits().get(2).getPagePos());
-			assertEquals(0, searchResults.getHits().get(3).getPagePos());
-			assertEquals(1, searchResults.getHits().get(4).getPagePos());
+			Assertions.assertFalse(searchResults.isEmpty());
+			Assertions.assertEquals(5, searchResults.size());
+			Assertions.assertEquals(0, searchResults.getHits().get(0).getPagePos());
+			Assertions.assertEquals(0, searchResults.getHits().get(1).getPagePos());
+			Assertions.assertEquals(1, searchResults.getHits().get(2).getPagePos());
+			Assertions.assertEquals(0, searchResults.getHits().get(3).getPagePos());
+			Assertions.assertEquals(1, searchResults.getHits().get(4).getPagePos());
 		} catch (IOException e) {
-			assertTrue(e.getMessage(), false);
+			Assertions.fail(e.getMessage());
 		}
 	}
 	
+	@Test
 	public void testUnicodeTrim() {
 		String[] testData = new String[] {
 				"", "",
@@ -45,10 +48,11 @@ public class SearchIndexTest extends TestCase {
 		};		
 		for (int i = 0; i < testData.length; i+= 2) {
 			String actualText = SearchIndex.unicodeTrim(testData[i]);
-			assertEquals((i / 2) + ": ", testData[i + 1], actualText);
+			Assertions.assertEquals(testData[i + 1], actualText, (i / 2) + ": ");
 		}
 	}
 
+	@Test
 	public void testInContent() {
 		Object[] testData = new Object[] {
 				"a", "a", new Integer[] {0},
@@ -69,14 +73,15 @@ public class SearchIndexTest extends TestCase {
 			String searchTerm = (String) testData[i];
 			Integer[] expectedResult = (Integer[]) testData[i + 2];
 			List<SearchResult> actualResult = SearchIndex.doSearch(searchTerm, content, resource);
-			assertEquals("test " + ((i / 3) + 1), expectedResult.length, actualResult.size());
+			Assertions.assertEquals(expectedResult.length, actualResult.size(), "test " + ((i / 3) + 1));
 			for (int j = 0; j < expectedResult.length; j++) {
 				SearchResult searchResult = actualResult.get(j);
-				assertEquals("test " + (i / 3) + ", match " + j, expectedResult[j].intValue(), searchResult.getPagePos());
+				Assertions.assertEquals(expectedResult[j].intValue(), searchResult.getPagePos(), "test " + (i / 3) + ", match " + j);
 			}
 		}
 	}
 
+	@Test
 	public void testCleanText() {
 		String[] testData = new String[] {
 				"", "",
@@ -94,7 +99,7 @@ public class SearchIndexTest extends TestCase {
 		};
 		for (int i = 0; i < testData.length; i+= 2) {
 			String actualText = SearchIndex.cleanText(testData[i]);
-			assertEquals((i / 2) + ": '" + testData[i] + "' => '" + actualText + "' does not match '" + testData[i + 1] + "\'", testData[i + 1], actualText);
+			Assertions.assertEquals(testData[i + 1], actualText, (i / 2) + ": '" + testData[i] + "' => '" + actualText + "' does not match '" + testData[i + 1] + "\'");
 		}
 	}
 }

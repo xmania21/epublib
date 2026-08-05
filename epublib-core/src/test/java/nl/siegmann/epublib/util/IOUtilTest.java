@@ -1,7 +1,7 @@
 package nl.siegmann.epublib.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Random;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class IOUtilTest {
 
@@ -71,7 +71,7 @@ public class IOUtilTest {
 		for (int i = 0; i < testData.length; i += 3) {
 			int actualResult = IOUtil.calcNewNrReadSize(testData[i], testData[i + 1]);
 			int expectedResult = testData[i + 2];
-			assertEquals((i / 3) + " : " + testData[i] + ", " + testData[i + 1], expectedResult, actualResult);
+			assertEquals(expectedResult, actualResult, (i / 3) + " : " + testData[i] + ", " + testData[i + 1]);
 		}
 	}
 }

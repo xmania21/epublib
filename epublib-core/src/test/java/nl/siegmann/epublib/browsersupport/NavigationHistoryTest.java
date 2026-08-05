@@ -1,6 +1,6 @@
 package nl.siegmann.epublib.browsersupport;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +8,7 @@ import java.util.Map;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Resource;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class NavigationHistoryTest {
 

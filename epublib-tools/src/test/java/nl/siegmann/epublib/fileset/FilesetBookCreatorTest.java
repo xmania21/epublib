@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import junit.framework.TestCase;
 import nl.siegmann.epublib.domain.Book;
 
 import org.apache.commons.io.IOUtils;
@@ -12,21 +11,25 @@ import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemManager;
 import org.apache.commons.vfs.NameScope;
 import org.apache.commons.vfs.VFS;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-public class FilesetBookCreatorTest extends TestCase {
+public class FilesetBookCreatorTest {
 	
+	@Test
 	public void test1() {
 		try {
 			FileObject dir = createDirWithSourceFiles();
 			Book book = FilesetBookCreator.createBookFromDirectory(dir);
-			assertEquals(5, book.getSpine().size());
-			assertEquals(5, book.getTableOfContents().size());
-		} catch(Exception e) {
+			Assertions.assertEquals(5, book.getSpine().size());
+			Assertions.assertEquals(5, book.getTableOfContents().size());
+		} catch (Exception e) {
 			e.printStackTrace();
-			assertTrue(false);
+			Assertions.fail(e.getMessage());
 		}
 	}
 
+	@Test
 	public void test2() {
 		try {
 			FileObject dir = createDirWithSourceFiles();
@@ -35,11 +38,11 @@ public class FilesetBookCreatorTest extends TestCase {
 			copyInputStreamToFileObject(new ByteArrayInputStream("hi".getBytes()), dir, "foo.nonsense");
 			
 			Book book = FilesetBookCreator.createBookFromDirectory(dir);
-			assertEquals(5, book.getSpine().size());
-			assertEquals(5, book.getTableOfContents().size());
-		} catch(Exception e) {
+			Assertions.assertEquals(5, book.getSpine().size());
+			Assertions.assertEquals(5, book.getTableOfContents().size());
+		} catch (Exception e) {
 			e.printStackTrace();
-			assertTrue(false);
+			Assertions.fail(e.getMessage());
 		}
 	}
 

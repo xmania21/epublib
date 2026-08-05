@@ -1,7 +1,7 @@
 package nl.siegmann.epublib.html.jsoup;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Resource;
@@ -20,7 +20,7 @@ public class JsoupHtmlProcessorTest {
 		processor.processBook(book);
 
 		String processedHtml = new String(resource.getData(), "UTF-8");
-		Assert.assertTrue(processedHtml.contains("<br />") || processedHtml.contains("<br/>"));
-		Assert.assertTrue(processedHtml.contains("</p>"));
+		Assertions.assertTrue(processedHtml.contains("<br />") || processedHtml.contains("<br/>"));
+		Assertions.assertTrue(processedHtml.contains("</p>"));
 	}
 }
