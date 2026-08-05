@@ -65,7 +65,7 @@ public class SearchIndexTest {
 				"u", "&uuml;", new Integer[] {0},
 				"a", "b", new Integer[] {},
 				"XXX", "<html><title>my title1</title><body><h1>wrong title</h1></body></html>", new Integer[] {},
-				"title", "<html><title>my title1</title><body><h1>wrong title</h1></body></html>", new Integer[] {3, 15}
+				"title", "<html><title>my title1</title><body><h1>wrong title</h1></body></html>", new Integer[] {3, 16}
 		};
 		for (int i = 0; i < testData.length; i+= 3) {
 			Resource resource = new Resource(((String) testData[i + 1]).getBytes(), MediatypeService.XHTML);

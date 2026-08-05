@@ -34,7 +34,7 @@
               <shadedArtifactAttached>false</shadedArtifactAttached>
               <transformers>
                 <transformer>
-                  <mainClass>nl.siegmann.epublib.viewer.Viewer</mainClass>
+                  <mainClass>nl.siegmann.epublib.viewer.ViewerApp</mainClass>
                 </transformer>
               </transformers>
             </configuration>

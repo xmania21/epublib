@@ -4,13 +4,19 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.datatransfer.DataFlavor;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.prefs.Preferences;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JFileChooser;
@@ -21,7 +27,9 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
+import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -53,6 +61,12 @@ public class Viewer {
 	private NavigationHistory browserHistory;
 	private BookProcessorPipeline epubCleaner = new BookProcessorPipeline(Collections.<BookProcessor>emptyList());
 	
+	private JTabbedPane leftTabbedPane;
+	private BookmarkPane bookmarkPane;
+	private boolean isFullScreen = false;
+	private final Preferences prefs = Preferences.userNodeForPackage(Viewer.class);
+	private JMenu recentFilesMenu;
+
 	public Viewer(InputStream bookStream) {
 		mainWindow = createMainWindow();
 		Book book;
@@ -80,21 +94,108 @@ public class Viewer {
 		}
 	}
 
+	private void openFile(File selectedFile) {
+		if (selectedFile == null || !selectedFile.exists()) {
+			return;
+		}
+		try {
+			Book book = (new EpubReader()).readEpub(new FileInputStream(selectedFile));
+			gotoBook(book);
+			saveRecentFile(selectedFile.getAbsolutePath());
+		} catch (Exception e1) {
+			log.error(e1.getMessage(), e1);
+		}
+	}
+
+	private void saveRecentFile(String path) {
+		String recent = prefs.get("recent_files", "");
+		List<String> list = new ArrayList<>();
+		list.add(path);
+		for (String p : recent.split(";")) {
+			if (!p.isBlank() && !p.equalsIgnoreCase(path) && list.size() < 5) {
+				list.add(p);
+			}
+		}
+		prefs.put("recent_files", String.join(";", list));
+		updateRecentFilesMenu();
+	}
+
+	private void updateRecentFilesMenu() {
+		if (recentFilesMenu == null) {
+			return;
+		}
+		recentFilesMenu.removeAll();
+		String recent = prefs.get("recent_files", "");
+		if (recent.isBlank()) {
+			JMenuItem emptyItem = new JMenuItem("(No recent files)");
+			emptyItem.setEnabled(false);
+			recentFilesMenu.add(emptyItem);
+			return;
+		}
+		for (String path : recent.split(";")) {
+			if (!path.isBlank()) {
+				File f = new File(path);
+				JMenuItem item = new JMenuItem(f.getName() + " (" + path + ")");
+				item.addActionListener(e -> openFile(f));
+				recentFilesMenu.add(item);
+			}
+		}
+	}
+
+	private void toggleFullScreen() {
+		GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+		mainWindow.dispose();
+		if (!isFullScreen) {
+			mainWindow.setUndecorated(true);
+			gd.setFullScreenWindow(mainWindow);
+			isFullScreen = true;
+		} else {
+			mainWindow.setUndecorated(false);
+			gd.setFullScreenWindow(null);
+			isFullScreen = false;
+		}
+		mainWindow.setVisible(true);
+	}
+
 	private JFrame createMainWindow() {
 		JFrame result = new JFrame();
 		result.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		result.setJMenuBar(createMenuBar());
 
+		result.setTransferHandler(new TransferHandler() {
+			@Override
+			public boolean canImport(TransferSupport support) {
+				return support.isDataFlavorSupported(DataFlavor.javaFileListFlavor);
+			}
+
+			@Override
+			public boolean importData(TransferSupport support) {
+				try {
+					@SuppressWarnings("unchecked")
+					List<File> files = (List<File>) support.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+					if (files != null && !files.isEmpty()) {
+						File droppedFile = files.get(0);
+						if (droppedFile.getName().toLowerCase().endsWith(".epub")) {
+							openFile(droppedFile);
+							return true;
+						}
+					}
+				} catch (Exception ex) {
+					log.error("Failed to process dropped file", ex);
+				}
+				return false;
+			}
+		});
+
 		JPanel mainPanel = new JPanel(new BorderLayout());
 		
-		leftSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-		leftSplitPane.setTopComponent(new TableOfContentsPane(navigator));
-		leftSplitPane.setBottomComponent(new GuidePane(navigator));
-		leftSplitPane.setOneTouchExpandable(true);
-		leftSplitPane.setContinuousLayout(true);
-		leftSplitPane.setResizeWeight(0.8);
-		
+		leftTabbedPane = new JTabbedPane();
+		leftTabbedPane.addTab("📖 Contents", new TableOfContentsPane(navigator));
+		this.bookmarkPane = new BookmarkPane(navigator);
+		leftTabbedPane.addTab("🔖 Bookmarks", bookmarkPane);
+		leftTabbedPane.addTab("🗺️ Guide", new GuidePane(navigator));
+
 		rightSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		rightSplitPane.setOneTouchExpandable(true);
 		rightSplitPane.setContinuousLayout(true);
@@ -108,14 +209,14 @@ public class Viewer {
 		rightSplitPane.setRightComponent(new MetadataPane(navigator));
 		
 		mainSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-		mainSplitPane.setLeftComponent(leftSplitPane);
+		mainSplitPane.setLeftComponent(leftTabbedPane);
 		mainSplitPane.setRightComponent(rightSplitPane);
 		mainSplitPane.setOneTouchExpandable(true);
 		mainSplitPane.setContinuousLayout(true);
 		mainSplitPane.setResizeWeight(0.0);
 		
 		mainPanel.add(mainSplitPane, BorderLayout.CENTER);
-		mainPanel.setPreferredSize(new Dimension(1000, 750));
+		mainPanel.setPreferredSize(new Dimension(1100, 780));
 		mainPanel.add(new NavigationBar(navigator), BorderLayout.NORTH);
 
 		result.add(mainPanel);
@@ -124,7 +225,6 @@ public class Viewer {
 		result.setVisible(true);
 		return result;
 	}
-	
 	
 	private void gotoBook(Book book) {
 		if (book == null) {
@@ -174,12 +274,7 @@ public class Viewer {
 				if (!selectedFile.isDirectory()) {
 					previousDir = selectedFile.getParentFile();
 				}
-				try {
-					Book book = (new EpubReader()).readEpub(new FileInputStream(selectedFile));
-					gotoBook(book);
-				} catch (Exception e1) {
-					log.error(e1.getMessage(), e1);
-				}
+				Viewer.this.openFile(selectedFile);
 			}
 			void saveFile() {
 				if (navigator.getBook() == null) {
@@ -207,6 +302,10 @@ public class Viewer {
 
 		openFileMenuItem.addActionListener(e -> fileHandler.openFile());
 		fileMenu.add(openFileMenuItem);
+
+		recentFilesMenu = new JMenu(getText("Open Recent"));
+		updateRecentFilesMenu();
+		fileMenu.add(recentFilesMenu);
 
 		JMenuItem saveFileMenuItem = new JMenuItem(getText("Save as ..."));
 		saveFileMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
@@ -243,6 +342,40 @@ public class Viewer {
 
 		viewMenu.addSeparator();
 
+		JMenuItem fullScreenMenuItem = new JMenuItem(getText("Full Screen (F11)"));
+		fullScreenMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0));
+		fullScreenMenuItem.addActionListener(e -> toggleFullScreen());
+		viewMenu.add(fullScreenMenuItem);
+
+		viewMenu.addSeparator();
+
+		JMenuItem zoomInItem = new JMenuItem(getText("Zoom In"));
+		zoomInItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, InputEvent.CTRL_DOWN_MASK));
+		zoomInItem.addActionListener(e -> htmlPane.zoomIn());
+		viewMenu.add(zoomInItem);
+
+		JMenuItem zoomOutItem = new JMenuItem(getText("Zoom Out"));
+		zoomOutItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_DOWN_MASK));
+		zoomOutItem.addActionListener(e -> htmlPane.zoomOut());
+		viewMenu.add(zoomOutItem);
+
+		JMenuItem resetZoomItem = new JMenuItem(getText("Reset Zoom"));
+		resetZoomItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_0, InputEvent.CTRL_DOWN_MASK));
+		resetZoomItem.addActionListener(e -> htmlPane.resetZoom());
+		viewMenu.add(resetZoomItem);
+
+		JMenu fontFamilyMenu = new JMenu(getText("Font Family"));
+		ButtonGroup fontGroup = new ButtonGroup();
+		for (String font : new String[]{"Sans-Serif", "Serif", "Monospace", "Dialog"}) {
+			JRadioButtonMenuItem fontItem = new JRadioButtonMenuItem(font, font.equals("Sans-Serif"));
+			fontItem.addActionListener(e -> htmlPane.setFontFamily(font));
+			fontGroup.add(fontItem);
+			fontFamilyMenu.add(fontItem);
+		}
+		viewMenu.add(fontFamilyMenu);
+
+		viewMenu.addSeparator();
+
 		JMenu themeMenu = new JMenu(getText("Theme"));
 		ButtonGroup themeGroup = new ButtonGroup();
 		for (ViewerTheme theme : ViewerTheme.values()) {
@@ -252,7 +385,19 @@ public class Viewer {
 			themeMenu.add(themeItem);
 		}
 		viewMenu.add(themeMenu);
-		
+
+		JMenu bookmarkMenu = new JMenu(getText("Bookmarks"));
+		menuBar.add(bookmarkMenu);
+
+		JMenuItem addBookmarkMenuItem = new JMenuItem(getText("Add Bookmark"));
+		addBookmarkMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.CTRL_DOWN_MASK));
+		addBookmarkMenuItem.addActionListener(e -> {
+			if (bookmarkPane != null) {
+				bookmarkPane.addCurrentBookmark();
+			}
+		});
+		bookmarkMenu.add(addBookmarkMenuItem);
+
 		JMenu helpMenu = new JMenu(getText("Help"));
 		menuBar.add(helpMenu);
 		JMenuItem aboutMenuItem = new JMenuItem(getText("About"));
@@ -283,37 +428,5 @@ public class Viewer {
 				rightSplitPane.setDividerLocation(0.6d);
 			}
 		}
-	}
-
-	private static InputStream getBookInputStream(String[] args) {
-		String bookFile = (args.length > 0) ? args[0] : null;
-		InputStream result = null;
-		if (!StringUtils.isBlank(bookFile)) {
-			try {
-				result = new FileInputStream(bookFile);
-			} catch (Exception e) {
-				log.error("Unable to open {}", bookFile, e);
-			}
-		}
-		if (result == null) {
-			result = Viewer.class.getResourceAsStream("/viewer/epublibviewer-help.epub");
-		}
-		return result;
-	}
-
-	public static void main(String[] args) throws FileNotFoundException, IOException {
-		try {
-			FlatLightLaf.setup();
-		} catch (Exception e) {
-			try {
-				UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-			} catch (Exception ex) {
-				log.error("Unable to set look and feel", ex);
-			}
-		}
-
-		final InputStream bookStream = getBookInputStream(args);
-		
-		javax.swing.SwingUtilities.invokeLater(() -> new Viewer(bookStream));
 	}
 }

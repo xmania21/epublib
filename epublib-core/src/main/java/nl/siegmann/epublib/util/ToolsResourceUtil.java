@@ -3,31 +3,17 @@ package nl.siegmann.epublib.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.Scanner;
-import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
 import javax.swing.ImageIcon;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
 
 import nl.siegmann.epublib.Constants;
 import nl.siegmann.epublib.domain.MediaType;
 import nl.siegmann.epublib.domain.Resource;
-import nl.siegmann.epublib.epub.EpubProcessorSupport;
 import nl.siegmann.epublib.service.MediatypeService;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 /**
  * Various resource utility methods
@@ -37,14 +23,15 @@ import org.xml.sax.SAXException;
  */
 public class ToolsResourceUtil {
 	
-	private static Logger log = LoggerFactory.getLogger(ToolsResourceUtil.class);
+	private static final Logger log = LoggerFactory.getLogger(ToolsResourceUtil.class);
 
 	public static ImageIcon getImageIcon(String resourceHref) {
-
-		try {
-			return new ImageIcon(IOUtil.toByteArray(ToolsResourceUtil.class.getResourceAsStream(resourceHref)));
+		try (InputStream is = ToolsResourceUtil.class.getResourceAsStream(resourceHref)) {
+			if (is != null) {
+				return new ImageIcon(IOUtil.toByteArray(is));
+			}
 		} catch (IOException e) {
-			log.error(e.getMessage());
+			log.error("Error loading image icon {}: {}", resourceHref, e.getMessage());
 		}
 		return null;
 	}
@@ -64,34 +51,47 @@ public class ToolsResourceUtil {
 	}
 
 	/**
-	 * Retrieves whatever it finds between &lt;title&gt;...&lt;/title&gt; or &lt;h1-7&gt;...&lt;/h1-7&gt;.
-	 * The first match is returned, even if it is a blank string.
+	 * Retrieves heading (hx), title, or first 50 chars of first sentence using JSoup.
 	 * 
-	 * @param resource
-	 * @return
+	 * @param resource XHTML Resource
+	 * @return extracted title string, or null if not found
 	 */
 	public static String findTitleFromXhtml(Resource resource) {
-		String result = null;
-		try {
-			Reader reader = resource.getReader();
-			Scanner scanner = new Scanner(reader);
-			scanner.useDelimiter(Pattern.compile("<(?i)(title|h[1-6])>"));
-			if (scanner.hasNext()) {
-				scanner.next();
+		if (resource == null) {
+			return null;
+		}
+		try (InputStream is = resource.getInputStream()) {
+			org.jsoup.nodes.Document doc = org.jsoup.Jsoup.parse(is, Constants.CHARACTER_ENCODING, "");
+			
+			// 1. Try first heading tag <h1>-<h6> (hx)
+			org.jsoup.nodes.Element heading = doc.selectFirst("h1, h2, h3, h4, h5, h6");
+			if (heading != null && !heading.text().isBlank()) {
+				return heading.text().trim();
 			}
-			if (scanner.hasNext()) {
-				Scanner scanner2 = new Scanner(scanner.next());
-				scanner2.useDelimiter(Pattern.compile("</(?i)(title|h[1-6])>"));
-				if (scanner2.hasNext()) {
-					result = scanner2.next();
-					result = StringEscapeUtils.unescapeHtml(result);
-
+			
+			// 2. Fallback to <title> tag if no hx found
+			String title = doc.title();
+			if (title != null && !title.isBlank()) {
+				return title.trim();
+			}
+			
+			// 3. Fallback to first 50 characters of the first sentence in body
+			if (doc.body() != null) {
+				String bodyText = doc.body().text().trim();
+				if (!bodyText.isEmpty()) {
+					int periodIdx = bodyText.indexOf('.');
+					String firstSentence = (periodIdx > 0) ? bodyText.substring(0, periodIdx) : bodyText;
+					firstSentence = firstSentence.trim();
+					if (firstSentence.length() > 50) {
+						firstSentence = firstSentence.substring(0, 50).trim();
+					}
+					return firstSentence;
 				}
 			}
-		} catch (IOException e) {
-			log.error(e.getMessage());
+		} catch (Exception e) {
+			log.error("Error parsing XHTML title from resource {}: {}", resource.getHref(), e.getMessage());
 		}
-		return result;
+		return null;
 	}
 
 	public static Resource createResource(File file) throws IOException {
@@ -100,36 +100,44 @@ public class ToolsResourceUtil {
 	
 	public static Resource createResource(File file, String encoding) throws IOException {
 		MediaType mediaType = MediatypeService.determineMediaType(file.getName());
-		byte[] data = IOUtils.toByteArray(new FileInputStream(file));
+		byte[] data;
+		try (InputStream fis = new FileInputStream(file)) {
+			data = IOUtils.toByteArray(fis);
+		}
 		return new Resource(null, data, file.getName(), mediaType, encoding);
 	}
 	
 	public static Resource createResource(String title, String resourceLocation) {
-		try {
-			return new Resource(null, IOUtil.toByteArray(ToolsResourceUtil.class.getResourceAsStream(resourceLocation)), resourceLocation, MediatypeService.determineMediaType(resourceLocation));
+		try (InputStream is = ToolsResourceUtil.class.getResourceAsStream(resourceLocation)) {
+			if (is != null) {
+				return new Resource(null, IOUtil.toByteArray(is), resourceLocation, MediatypeService.determineMediaType(resourceLocation));
+			}
 		} catch (IOException e) {
-			log.error(e.getMessage());
+			log.error("Error creating resource {}: {}", resourceLocation, e.getMessage());
 		}
 		return null;
 	}
 
 	public static String getAsString(String resourceLocation) {
-		return getAsString(ToolsResourceUtil.class.getResourceAsStream(resourceLocation));
+		try (InputStream is = ToolsResourceUtil.class.getResourceAsStream(resourceLocation)) {
+			if (is != null) {
+				return getAsString(is);
+			}
+		} catch (IOException e) {
+			log.error("Error reading resource as string {}: {}", resourceLocation, e.getMessage());
+		}
+		return "";
 	}
 
 	public static String getAsString(InputStream inputStream) {
-
 		if (inputStream == null) {
 			return "";
 		}
-
-		StringBuilder result = new StringBuilder();
-		try (Scanner scanner = new Scanner(inputStream)) {
-			while (scanner.hasNextLine()) {
-				result.append(scanner.nextLine());
-				result.append("\n");
-			}
+		try {
+			return IOUtils.toString(inputStream, Constants.CHARACTER_ENCODING);
+		} catch (IOException e) {
+			log.error("Error converting stream to string: {}", e.getMessage());
+			return "";
 		}
-		return result.toString();
 	}
 }

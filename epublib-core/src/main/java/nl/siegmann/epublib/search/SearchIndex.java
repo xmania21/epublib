@@ -124,19 +124,17 @@ public class SearchIndex {
 	}
 
 	public static String getSearchContent(Reader content) {
-		StringBuilder result = new StringBuilder();
-		Scanner scanner = new Scanner(content);
-		scanner.useDelimiter("<");
-		while (scanner.hasNext()) {
-			String text = scanner.next();
-			int closePos = text.indexOf('>');
-			String chunk = text.substring(closePos + 1).trim();
-			chunk = org.apache.commons.lang.StringEscapeUtils.unescapeHtml(chunk);
-			chunk = cleanText(chunk);
-			result.append(chunk);
+		if (content == null) {
+			return "";
 		}
-		scanner.close();
-		return result.toString();
+		try (Reader r = content) {
+			String html = org.apache.commons.io.IOUtils.toString(r);
+			org.jsoup.nodes.Document doc = org.jsoup.Jsoup.parse(html);
+			return cleanText(doc.text());
+		} catch (IOException e) {
+			log.error("Error reading search content: {}", e.getMessage(), e);
+			return "";
+		}
 	}
 	
 	/**

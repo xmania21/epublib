@@ -45,8 +45,11 @@ public class SpineSlider extends JSlider implements NavigationEventListener {
 
 		private void updateToolTip() {
 			String tooltip = "";
-			if (navigator.getCurrentSpinePos() >= 0 && navigator.getBook() != null) {
-				tooltip = String.valueOf(navigator.getCurrentSpinePos() + 1) + " / " + navigator.getBook().getSpine().size();
+			if (navigator.getCurrentSpinePos() >= 0 && navigator.getBook() != null && !navigator.getBook().getSpine().isEmpty()) {
+				int current = navigator.getCurrentSpinePos() + 1;
+				int total = navigator.getBook().getSpine().size();
+				int percent = (int) (((double) current / total) * 100);
+				tooltip = "Chapter " + current + " of " + total + " • " + percent + "%";
 			}
 			setToolTipText(tooltip);
 		}

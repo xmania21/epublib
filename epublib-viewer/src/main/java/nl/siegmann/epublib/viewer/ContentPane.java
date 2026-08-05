@@ -233,6 +233,35 @@ public class ContentPane extends JPanel implements NavigationEventListener,
 		return editorPane;
 	}
 
+	private int fontSizePt = 14;
+	private String fontFamily = "Sans-Serif";
+
+	public void zoomIn() {
+		if (fontSizePt < 36) {
+			fontSizePt += 2;
+			applyTheme(currentTheme);
+		}
+	}
+
+	public void zoomOut() {
+		if (fontSizePt > 8) {
+			fontSizePt -= 2;
+			applyTheme(currentTheme);
+		}
+	}
+
+	public void resetZoom() {
+		fontSizePt = 14;
+		applyTheme(currentTheme);
+	}
+
+	public void setFontFamily(String family) {
+		if (family != null && !family.isBlank()) {
+			this.fontFamily = family;
+			applyTheme(currentTheme);
+		}
+	}
+
 	public void applyTheme(ViewerTheme theme) {
 		if (theme == null) {
 			return;
@@ -243,17 +272,23 @@ public class ContentPane extends JPanel implements NavigationEventListener,
 			editorPane.setForeground(theme.getTextColor());
 			editorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
 			
+			String rule = "body { background-color: " + theme.getBgHex() + "; color: " + theme.getTextHex() + "; font-size: " + fontSizePt + "pt; font-family: " + fontFamily + "; }";
+			String linkRule = "a { color: " + theme.getLinkHex() + "; }";
+			String textRule = "p, div, td, li { color: " + theme.getTextHex() + "; font-size: " + fontSizePt + "pt; font-family: " + fontFamily + "; }";
+
 			HTMLEditorKit htmlKit = (HTMLEditorKit) editorPane.getEditorKit();
 			if (htmlKit != null) {
 				StyleSheet styleSheet = htmlKit.getStyleSheet();
-				styleSheet.addRule("body { background-color: " + theme.getBgHex() + "; color: " + theme.getTextHex() + "; }");
-				styleSheet.addRule("a { color: " + theme.getLinkHex() + "; }");
+				styleSheet.addRule(rule);
+				styleSheet.addRule(linkRule);
+				styleSheet.addRule(textRule);
 			}
 
 			if (editorPane.getDocument() instanceof HTMLDocument htmlDoc) {
 				StyleSheet docStyleSheet = htmlDoc.getStyleSheet();
-				docStyleSheet.addRule("body { background-color: " + theme.getBgHex() + "; color: " + theme.getTextHex() + "; }");
-				docStyleSheet.addRule("a { color: " + theme.getLinkHex() + "; }");
+				docStyleSheet.addRule(rule);
+				docStyleSheet.addRule(linkRule);
+				docStyleSheet.addRule(textRule);
 			}
 
 			editorPane.repaint();

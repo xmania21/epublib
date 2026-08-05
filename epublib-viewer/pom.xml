@@ -67,7 +67,7 @@
 							<shadedArtifactAttached>false</shadedArtifactAttached>
 							<transformers>
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>nl.siegmann.epublib.viewer.Viewer</mainClass>
+									<mainClass>nl.siegmann.epublib.viewer.ViewerApp</mainClass>
 								</transformer>
 							</transformers>
 						</configuration>
