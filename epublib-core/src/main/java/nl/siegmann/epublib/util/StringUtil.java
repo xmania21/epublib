@@ -3,14 +3,10 @@ package nl.siegmann.epublib.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Various String utility functions.
- * 
- * Most of the functions herein are re-implementations of the ones in apache
- * commons StringUtils. The reason for re-implementing this is that the
- * functions are fairly simple and using my own implementation saves the
- * inclusion of a 200Kb jar file.
  * 
  * @author paul.siegmann
  * 
@@ -27,10 +23,10 @@ public class StringUtil {
 	 */
 	public static String collapsePathDots(String path) {
 		String[] stringParts = path.split("/");
-		List<String> parts = new ArrayList<String>(Arrays.asList(stringParts));
+		List<String> parts = new ArrayList<>(Arrays.asList(stringParts));
 		for (int i = 0; i < parts.size() - 1; i++) {
 			String currentDir = parts.get(i);
-			if (currentDir.length() == 0 || currentDir.equals(".")) {
+			if (currentDir.isEmpty() || currentDir.equals(".")) {
 				parts.remove(i);
 				i--;
 			} else if (currentDir.equals("..")) {
@@ -39,7 +35,7 @@ public class StringUtil {
 				i -= 2;
 			}
 		}
-		StringBuilder result = new StringBuilder();
+		var result = new StringBuilder();
 		if (path.startsWith("/")) {
 			result.append('/');
 		}
@@ -53,31 +49,22 @@ public class StringUtil {
 	}
 
 	/**
-	 * Whether the String is not null, not zero-length and does not contain of
-	 * only whitespace.
+	 * Whether the String is not null, not zero-length and does not contain only whitespace.
 	 * 
 	 * @param text
-	 * @return Whether the String is not null, not zero-length and does not contain of
+	 * @return Whether the String is not null, not zero-length and does not contain only whitespace.
 	 */
 	public static boolean isNotBlank(String text) {
 		return !isBlank(text);
 	}
 
 	/**
-	 * Whether the String is null, zero-length and does contain only whitespace.
+	 * Whether the String is null, zero-length or contains only whitespace.
 	 *
-	 * @return Whether the String is null, zero-length and does contain only whitespace.
+	 * @return Whether the String is null, zero-length or contains only whitespace.
 	 */
 	public static boolean isBlank(String text) {
-		if (isEmpty(text)) {
-			return true;
-		}
-		for (int i = 0; i < text.length(); i++) {
-			if (!Character.isWhitespace(text.charAt(i))) {
-				return false;
-			}
-		}
-		return true;
+		return text == null || text.isBlank();
 	}
 
 	/**
@@ -87,7 +74,7 @@ public class StringUtil {
 	 * @return Whether the given string is null or zero-length.
 	 */
 	public static boolean isEmpty(String text) {
-		return (text == null) || (text.length() == 0);
+		return text == null || text.isEmpty();
 	}
 
 	/**
@@ -102,10 +89,7 @@ public class StringUtil {
 		if (isEmpty(suffix)) {
 			return true;
 		}
-		if (isEmpty(source)) {
-			return false;
-		}
-		if (suffix.length() > source.length()) {
+		if (isEmpty(source) || suffix.length() > source.length()) {
 			return false;
 		}
 		return source.substring(source.length() - suffix.length())
@@ -123,17 +107,14 @@ public class StringUtil {
 	}
 
 	/**
-	 * If the given text is null return "", the given defaultValue otherwise.
+	 * If the given text is null return defaultValue, the given text otherwise.
 	 * 
 	 * @param text
 	 * @param defaultValue
-	 * @return If the given text is null "", the given defaultValue otherwise.
+	 * @return If the given text is null defaultValue, the given text otherwise.
 	 */
 	public static String defaultIfNull(String text, String defaultValue) {
-		if (text == null) {
-			return defaultValue;
-		}
-		return text;
+		return text == null ? defaultValue : text;
 	}
 
 	/**
@@ -144,10 +125,7 @@ public class StringUtil {
 	 * @return whether the two strings are equal
 	 */
 	public static boolean equals(String text1, String text2) {
-		if (text1 == null) {
-			return (text2 == null);
-		}
-		return text1.equals(text2);
+		return Objects.equals(text1, text2);
 	}
 
 	/**

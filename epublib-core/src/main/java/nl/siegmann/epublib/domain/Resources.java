@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import nl.siegmann.epublib.Constants;
 import nl.siegmann.epublib.service.MediatypeService;
@@ -21,15 +23,12 @@ import nl.siegmann.epublib.util.StringUtil;
  */
 public class Resources implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 2450876953383871451L;
 	private static final String IMAGE_PREFIX = "image_";
 	private static final String ITEM_PREFIX = "item_";
 	private int lastId = 1;
 	
-	private Map<String, Resource> resources = new HashMap<String, Resource>();
+	private Map<String, Resource> resources = new HashMap<>();
 	
 	/**
 	 * Adds a resource to the resources.
@@ -52,7 +51,7 @@ public class Resources implements Serializable {
 	 * @param resource
 	 */
 	public void fixResourceId(Resource resource) {
-		String  resourceId = resource.getId();
+		String resourceId = resource.getId();
 		
 		// first try and create a unique id based on the resource's href
 		if (StringUtil.isBlank(resource.getId())) {
@@ -76,20 +75,14 @@ public class Resources implements Serializable {
 	 * @return a valid id
 	 */
 	private String makeValidId(String resourceId, Resource resource) {
-		if (StringUtil.isNotBlank(resourceId) && ! Character.isJavaIdentifierStart(resourceId.charAt(0))) {
+		if (StringUtil.isNotBlank(resourceId) && !Character.isJavaIdentifierStart(resourceId.charAt(0))) {
 			resourceId = getResourceItemPrefix(resource) + resourceId;
 		}
 		return resourceId;
 	}
 	
 	private String getResourceItemPrefix(Resource resource) {
-		String result;
-		if (MediatypeService.isBitmapImage(resource.getMediaType())) {
-			result = IMAGE_PREFIX;
-		} else {
-			result = ITEM_PREFIX;
-		}
-		return result;
+		return MediatypeService.isBitmapImage(resource.getMediaType()) ? IMAGE_PREFIX : ITEM_PREFIX;
 	}
 	
 	/**
@@ -110,7 +103,7 @@ public class Resources implements Serializable {
 		String prefix = getResourceItemPrefix(resource);
 		String result = prefix + counter;
 		while (containsId(result)) {
-			result = prefix + (++ counter);
+			result = prefix + (++counter);
 		}
 		lastId = counter;
 		return result;
@@ -126,12 +119,7 @@ public class Resources implements Serializable {
 		if (StringUtil.isBlank(id)) {
 			return false;
 		}
-		for (Resource resource: resources.values()) {
-			if (id.equals(resource.getId())) {
-				return true;
-			}
-		}
-		return false;
+		return resources.values().stream().anyMatch(res -> id.equals(res.getId()));
 	}
 	
 	/**
@@ -144,12 +132,10 @@ public class Resources implements Serializable {
 		if (StringUtil.isBlank(id)) {
 			return null;
 		}
-		for (Resource resource: resources.values()) {
-			if (id.equals(resource.getId())) {
-				return resource;
-			}
-		}
-		return null;
+		return resources.values().stream()
+				.filter(res -> id.equals(res.getId()))
+				.findFirst()
+				.orElse(null);
 	}
 	
 	/**
@@ -163,17 +149,16 @@ public class Resources implements Serializable {
 	}
 	
 	private void fixResourceHref(Resource resource) {
-		if(StringUtil.isNotBlank(resource.getHref())
-				&& ! resources.containsKey(resource.getHref())) {
+		if (StringUtil.isNotBlank(resource.getHref()) && !resources.containsKey(resource.getHref())) {
 			return;
 		}
-		if(StringUtil.isBlank(resource.getHref())) {
-			if(resource.getMediaType() == null) {
+		if (StringUtil.isBlank(resource.getHref())) {
+			if (resource.getMediaType() == null) {
 				throw new IllegalArgumentException("Resource must have either a MediaType or a href");
 			}
 			int i = 1;
 			String href = createHref(resource.getMediaType(), i);
-			while(resources.containsKey(href)) {
+			while (resources.containsKey(href)) {
 				href = createHref(resource.getMediaType(), (++i));
 			}
 			resource.setHref(href);
@@ -181,13 +166,9 @@ public class Resources implements Serializable {
 	}
 	
 	private String createHref(MediaType mediaType, int counter) {
-		if(MediatypeService.isBitmapImage(mediaType)) {
-			return "image_" + counter + mediaType.getDefaultExtension();
-		} else {
-			return "item_" + counter + mediaType.getDefaultExtension();
-		}
+		String prefix = MediatypeService.isBitmapImage(mediaType) ? "image_" : "item_";
+		return prefix + counter + mediaType.getDefaultExtension();
 	}
-	
 	
 	public boolean isEmpty() {
 		return resources.isEmpty();
@@ -214,7 +195,6 @@ public class Resources implements Serializable {
 	public Collection<Resource> getAll() {
 		return resources.values();
 	}
-	
 	
 	/**
 	 * Whether there exists a resource with the given href
@@ -244,7 +224,7 @@ public class Resources implements Serializable {
 	 * @param resources
 	 */
 	public void addAll(Collection<Resource> resources) {
-		for(Resource resource: resources) {
+		for (Resource resource : resources) {
 			fixResourceHref(resource);
 			this.resources.put(resource.getHref(), resource);
 		}
@@ -256,9 +236,8 @@ public class Resources implements Serializable {
 	 * @param resources A map with as keys the resources href and as values the Resources
 	 */
 	public void set(Map<String, Resource> resources) {
-		this.resources = new HashMap<String, Resource>(resources);
+		this.resources = new HashMap<>(resources);
 	}
-	
 	
 	/**
 	 * First tries to find a resource with as id the given idOrHref, if that 
@@ -275,7 +254,6 @@ public class Resources implements Serializable {
 		return resource;
 	}
 	
-	
 	/**
 	 * Gets the resource with the given href.
 	 * If the given href contains a fragmentId then that fragment id will be ignored.
@@ -288,8 +266,7 @@ public class Resources implements Serializable {
 			return null;
 		}
 		href = StringUtil.substringBefore(href, Constants.FRAGMENT_SEPARATOR_CHAR);
-		Resource result = resources.get(href);
-		return result;
+		return resources.get(href);
 	}
 	
 	/**
@@ -313,12 +290,13 @@ public class Resources implements Serializable {
 	 * @return the first resource (random order) with the give mediatype.
 	 */
 	public static Resource findFirstResourceByMediaType(Collection<Resource> resources, MediaType mediaType) {
-		for (Resource resource: resources) {
-			if (resource.getMediaType() == mediaType) {
-				return resource;
-			}
+		if (resources == null || mediaType == null) {
+			return null;
 		}
-		return null;
+		return resources.stream()
+				.filter(resource -> resource.getMediaType() == mediaType)
+				.findFirst()
+				.orElse(null);
 	}
 
 	/**
@@ -328,16 +306,12 @@ public class Resources implements Serializable {
 	 * @return All resources that have the given MediaType.
 	 */
 	public List<Resource> getResourcesByMediaType(MediaType mediaType) {
-		List<Resource> result = new ArrayList<Resource>();
 		if (mediaType == null) {
-			return result;
+			return new ArrayList<>();
 		}
-		for (Resource resource: getAll()) {
-			if (resource.getMediaType() == mediaType) {
-				result.add(resource);
-			}
-		}
-		return result;
+		return getAll().stream()
+				.filter(resource -> resource.getMediaType() == mediaType)
+				.collect(Collectors.toList());
 	}
 
 	/**
@@ -347,22 +321,14 @@ public class Resources implements Serializable {
 	 * @return All Resources that match any of the given list of MediaTypes
 	 */
 	public List<Resource> getResourcesByMediaTypes(MediaType[] mediaTypes) {
-		List<Resource> result = new ArrayList<Resource>();
-		if (mediaTypes == null) {
-			return result;
+		if (mediaTypes == null || mediaTypes.length == 0) {
+			return new ArrayList<>();
 		}
-		
-		// this is the fastest way of doing this according to 
-		// http://stackoverflow.com/questions/1128723/in-java-how-can-i-test-if-an-array-contains-a-certain-value
-		List<MediaType> mediaTypesList = Arrays.asList(mediaTypes);
-		for (Resource resource: getAll()) {
-			if (mediaTypesList.contains(resource.getMediaType())) {
-				result.add(resource);
-			}
-		}
-		return result;
+		Set<MediaType> mediaTypesSet = Set.of(mediaTypes);
+		return getAll().stream()
+				.filter(resource -> mediaTypesSet.contains(resource.getMediaType()))
+				.collect(Collectors.toList());
 	}
-
 
 	/**
 	 * All resource hrefs
