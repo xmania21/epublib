@@ -6,6 +6,7 @@ import java.util.List;
 
 import nl.siegmann.epublib.epub.BookProcessor;
 import nl.siegmann.epublib.epub.BookProcessorPipeline;
+import nl.siegmann.epublib.html.jsoup.JsoupHtmlProcessor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +32,7 @@ public class DefaultBookProcessorPipeline extends BookProcessorPipeline {
 		List<BookProcessor> result = new ArrayList<BookProcessor>();
 		result.addAll(Arrays.asList(new BookProcessor[] {
 			new SectionHrefSanityCheckBookProcessor(),
-			new HtmlCleanerBookProcessor(),
+			new JsoupHtmlProcessor(),
 			new CoverpageBookProcessor(),
 			new FixIdentifierBookProcessor()
 		}));

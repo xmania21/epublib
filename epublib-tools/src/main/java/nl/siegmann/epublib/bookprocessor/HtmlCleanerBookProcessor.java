@@ -23,8 +23,9 @@ import org.slf4j.LoggerFactory;
  * Cleans up regular html into xhtml. Uses HtmlCleaner to do this.
  * 
  * @author paul
- * 
+ * @deprecated Use {@link nl.siegmann.epublib.html.jsoup.JsoupHtmlProcessor} instead.
  */
+@Deprecated(since = "4.0", forRemoval = true)
 public class HtmlCleanerBookProcessor extends HtmlBookProcessor implements
 		BookProcessor {
 
