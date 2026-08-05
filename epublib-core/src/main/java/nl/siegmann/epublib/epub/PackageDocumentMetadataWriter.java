@@ -76,14 +76,25 @@ public class PackageDocumentMetadataWriter extends PackageDocumentBase {
 		}
 
 		// write other properties
+		boolean hasModified = false;
 		if(book.getMetadata().getOtherProperties() != null) {
 			for(Map.Entry<QName, String> mapEntry: book.getMetadata().getOtherProperties().entrySet()) {
+				if ("dcterms:modified".equals(mapEntry.getKey().getLocalPart())) {
+					hasModified = true;
+				}
 				serializer.startTag(mapEntry.getKey().getNamespaceURI(), OPFTags.meta);
 				serializer.attribute(EpubWriter.EMPTY_NAMESPACE_PREFIX, OPFAttributes.property, mapEntry.getKey().getLocalPart());
 				serializer.text(mapEntry.getValue());
 				serializer.endTag(mapEntry.getKey().getNamespaceURI(), OPFTags.meta);
-				
 			}
+		}
+
+		if (!hasModified) {
+			String utcNow = java.time.format.DateTimeFormatter.ISO_INSTANT.format(java.time.Instant.now().truncatedTo(java.time.temporal.ChronoUnit.SECONDS));
+			serializer.startTag(EpubWriter.EMPTY_NAMESPACE_PREFIX, OPFTags.meta);
+			serializer.attribute(EpubWriter.EMPTY_NAMESPACE_PREFIX, OPFAttributes.property, "dcterms:modified");
+			serializer.text(utcNow);
+			serializer.endTag(EpubWriter.EMPTY_NAMESPACE_PREFIX, OPFTags.meta);
 		}
 
 		// write coverimage
