@@ -74,6 +74,15 @@ public class HTMLDocumentFactory implements NavigationEventListener {
 			cacheWriteLock.unlock();
 		}
 	}
+
+	public void clearCache() {
+		cacheWriteLock.lock();
+		try {
+			documentCache.clear();
+		} finally {
+			cacheWriteLock.unlock();
+		}
+	}
 	
 	
 	/**

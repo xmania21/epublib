@@ -52,7 +52,7 @@ public class ContentPane extends JPanel implements NavigationEventListener,
 	private JEditorPane editorPane;
 	private JScrollPane scrollPane;
 	private HTMLDocumentFactory htmlDocumentFactory;
-	private ViewerTheme currentTheme = ViewerTheme.LIGHT;
+	private ReaderTheme currentReaderTheme = ReaderTheme.LIGHT;
 	
 	public ContentPane(Navigator navigator) {
 		super(new GridLayout(1, 0));
@@ -201,10 +201,19 @@ public class ContentPane extends JPanel implements NavigationEventListener,
 	}
 
 	private JEditorPane createJEditorPane() {
-		JEditorPane editorPane = new JEditorPane();
-		editorPane.setBackground(currentTheme.getBackgroundColor());
-		editorPane.setForeground(currentTheme.getTextColor());
-		editorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+		JEditorPane editorPane = new JEditorPane() {
+			@Override
+			public void updateUI() {
+				super.updateUI();
+				if (currentReaderTheme != null) {
+					setBackground(currentReaderTheme.getBackgroundColor());
+					setForeground(currentReaderTheme.getTextColor());
+				}
+			}
+		};
+		editorPane.setBackground(currentReaderTheme.getBackgroundColor());
+		editorPane.setForeground(currentReaderTheme.getTextColor());
+		editorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.FALSE);
 		editorPane.setEditable(false);
 		HTMLEditorKit htmlKit = new HTMLEditorKit();
 		editorPane.setEditorKit(htmlKit);
@@ -239,56 +248,96 @@ public class ContentPane extends JPanel implements NavigationEventListener,
 	public void zoomIn() {
 		if (fontSizePt < 36) {
 			fontSizePt += 2;
-			applyTheme(currentTheme);
+			applyReaderTheme(currentReaderTheme);
 		}
 	}
 
 	public void zoomOut() {
 		if (fontSizePt > 8) {
 			fontSizePt -= 2;
-			applyTheme(currentTheme);
+			applyReaderTheme(currentReaderTheme);
 		}
 	}
 
 	public void resetZoom() {
 		fontSizePt = 14;
-		applyTheme(currentTheme);
+		applyReaderTheme(currentReaderTheme);
 	}
 
 	public void setFontFamily(String family) {
 		if (family != null && !family.isBlank()) {
 			this.fontFamily = family;
-			applyTheme(currentTheme);
+			applyReaderTheme(currentReaderTheme);
 		}
 	}
 
-	public void applyTheme(ViewerTheme theme) {
+	@Override
+	public void updateUI() {
+		super.updateUI();
+		if (currentReaderTheme != null) {
+			setBackground(currentReaderTheme.getBackgroundColor());
+			if (scrollPane != null) {
+				scrollPane.setBackground(currentReaderTheme.getBackgroundColor());
+				if (scrollPane.getViewport() != null) {
+					scrollPane.getViewport().setBackground(currentReaderTheme.getBackgroundColor());
+				}
+			}
+		}
+	}
+
+	public void applyReaderTheme(ReaderTheme theme) {
 		if (theme == null) {
 			return;
 		}
-		this.currentTheme = theme;
+		boolean themeChanged = (this.currentReaderTheme != theme);
+		this.currentReaderTheme = theme;
+		Color bg = theme.getBackgroundColor();
+		Color fg = theme.getTextColor();
+
+		setBackground(bg);
+		if (scrollPane != null) {
+			scrollPane.setBackground(bg);
+			if (scrollPane.getViewport() != null) {
+				scrollPane.getViewport().setBackground(bg);
+			}
+		}
 		if (editorPane != null) {
-			editorPane.setBackground(theme.getBackgroundColor());
-			editorPane.setForeground(theme.getTextColor());
-			editorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+			editorPane.setBackground(bg);
+			editorPane.setForeground(fg);
+			editorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.FALSE);
 			
-			String rule = "body { background-color: " + theme.getBgHex() + "; color: " + theme.getTextHex() + "; font-size: " + fontSizePt + "pt; font-family: " + fontFamily + "; }";
-			String linkRule = "a { color: " + theme.getLinkHex() + "; }";
-			String textRule = "p, div, td, li { color: " + theme.getTextHex() + "; font-size: " + fontSizePt + "pt; font-family: " + fontFamily + "; }";
+			String bgHex = theme.getBgHex();
+			String textHex = theme.getTextHex();
+			String linkHex = theme.getLinkHex();
+
+			String rootRule = "html, body { background-color: " + bgHex + "; color: " + textHex + "; font-size: " + fontSizePt + "pt; font-family: " + fontFamily + "; }";
+			String blockRule = "p, div, td, th, tr, table, thead, tbody, tfoot, ul, ol, li, dl, dt, dd, h1, h2, h3, h4, h5, h6, blockquote, pre, code, section, article, header, footer, nav, main, figure, figcaption, form, hr, implied { color: " + textHex + "; background-color: " + bgHex + "; font-size: " + fontSizePt + "pt; font-family: " + fontFamily + "; }";
+			String inlineRule = "span, em, strong, b, i, u, s, small, mark, sub, sup { color: " + textHex + "; font-size: " + fontSizePt + "pt; font-family: " + fontFamily + "; }";
+			String linkRule = "a, a:link, a:visited, a:hover, a:active { color: " + linkHex + "; }";
 
 			HTMLEditorKit htmlKit = (HTMLEditorKit) editorPane.getEditorKit();
 			if (htmlKit != null) {
 				StyleSheet styleSheet = htmlKit.getStyleSheet();
-				styleSheet.addRule(rule);
+				styleSheet.addRule(rootRule);
+				styleSheet.addRule(blockRule);
+				styleSheet.addRule(inlineRule);
 				styleSheet.addRule(linkRule);
-				styleSheet.addRule(textRule);
+			}
+
+			if (themeChanged && htmlDocumentFactory != null && currentResource != null) {
+				htmlDocumentFactory.clearCache();
+				HTMLDocument freshDoc = htmlDocumentFactory.getDocument(currentResource);
+				if (freshDoc != null) {
+					editorPane.setDocument(freshDoc);
+				}
 			}
 
 			if (editorPane.getDocument() instanceof HTMLDocument htmlDoc) {
 				StyleSheet docStyleSheet = htmlDoc.getStyleSheet();
-				docStyleSheet.addRule(rule);
+				docStyleSheet.addRule(rootRule);
+				docStyleSheet.addRule(blockRule);
+				docStyleSheet.addRule(inlineRule);
 				docStyleSheet.addRule(linkRule);
-				docStyleSheet.addRule(textRule);
 			}
 
 			editorPane.repaint();
@@ -310,7 +359,7 @@ public class ContentPane extends JPanel implements NavigationEventListener,
 			}
 			currentResource = resource;
 			editorPane.setDocument(document);
-			applyTheme(currentTheme);
+			applyReaderTheme(currentReaderTheme);
 			scrollToCurrentPosition(sectionPos);
 		} catch (Exception e) {
 			log.error("When reading resource " + resource.getId() + "("

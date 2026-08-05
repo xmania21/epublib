@@ -26,9 +26,14 @@ class ButtonBar extends JPanel {
 	private ContentPane chapterPane;
 	private final ValueHolder<Navigator> navigatorHolder = new ValueHolder<Navigator>();
 	
-	public ButtonBar(Navigator navigator, ContentPane chapterPane) {
+	private JComboBox<ReaderTheme> themeBox;
+	private Viewer viewer;
+	private boolean isUpdatingThemeBox = false;
+	
+	public ButtonBar(Navigator navigator, ContentPane chapterPane, Viewer viewer) {
 		super(new GridLayout(0, 5));
 		this.chapterPane = chapterPane;
+		this.viewer = viewer;
 		
 		JPanel bigPrevious = new JPanel(new GridLayout(0, 2));
 		bigPrevious.add(startButton);
@@ -43,18 +48,33 @@ class ButtonBar extends JPanel {
 		bigNext.add(endButton);
 		add(bigNext);
 
-		JComboBox<ViewerTheme> themeBox = new JComboBox<>(ViewerTheme.values());
-		themeBox.setToolTipText("Select UI & Reader Theme");
-		themeBox.addActionListener(e -> {
-			ViewerTheme selectedTheme = (ViewerTheme) themeBox.getSelectedItem();
-			if (selectedTheme != null && chapterPane != null) {
-				chapterPane.applyTheme(selectedTheme);
-				selectedTheme.setupLaf();
+		this.themeBox = new JComboBox<>(ReaderTheme.values());
+		this.themeBox.setToolTipText("Select Reader Page Theme");
+		this.themeBox.addActionListener(e -> {
+			if (isUpdatingThemeBox) {
+				return;
+			}
+			ReaderTheme selectedTheme = (ReaderTheme) themeBox.getSelectedItem();
+			if (selectedTheme != null && this.viewer != null) {
+				this.viewer.setReaderTheme(selectedTheme);
+			} else if (selectedTheme != null && chapterPane != null) {
+				chapterPane.applyReaderTheme(selectedTheme);
 			}
 		});
 		add(themeBox);
 		
 		setSectionWalker(navigator);
+	}
+
+	public void setSelectedReaderTheme(ReaderTheme theme) {
+		if (theme != null && themeBox != null && themeBox.getSelectedItem() != theme) {
+			isUpdatingThemeBox = true;
+			try {
+				themeBox.setSelectedItem(theme);
+			} finally {
+				isUpdatingThemeBox = false;
+			}
+		}
 	}
 	
 	public void setSectionWalker(Navigator navigator) {

@@ -15,7 +15,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.prefs.Preferences;
 
 import javax.swing.ButtonGroup;
@@ -56,7 +58,9 @@ public class Viewer {
 	private JSplitPane leftSplitPane;
 	private JSplitPane rightSplitPane;
 	private ContentPane htmlPane;
-	private ViewerTheme currentTheme = ViewerTheme.LIGHT;
+	private UiTheme currentUiTheme = UiTheme.LIGHT;
+	private ReaderTheme currentReaderTheme = ReaderTheme.LIGHT;
+	private Map<ReaderTheme, JRadioButtonMenuItem> readerThemeMenuItems = new HashMap<>();
 	private Navigator navigator = new Navigator();
 	private NavigationHistory browserHistory;
 	private BookProcessorPipeline epubCleaner = new BookProcessorPipeline(Collections.<BookProcessor>emptyList());
@@ -83,14 +87,31 @@ public class Viewer {
 		gotoBook(book);
 	}
 
-	public void setTheme(ViewerTheme theme) {
+	public void setUiTheme(UiTheme theme) {
 		if (theme == null) {
 			return;
 		}
-		this.currentTheme = theme;
-		theme.setupLaf();
+		this.currentUiTheme = theme;
+		theme.apply();
 		if (htmlPane != null) {
-			htmlPane.applyTheme(theme);
+			htmlPane.applyReaderTheme(currentReaderTheme);
+		}
+	}
+
+	public void setReaderTheme(ReaderTheme theme) {
+		if (theme == null) {
+			return;
+		}
+		this.currentReaderTheme = theme;
+		if (htmlPane != null) {
+			htmlPane.applyReaderTheme(theme);
+		}
+		if (browseBar != null) {
+			browseBar.setSelectedReaderTheme(theme);
+		}
+		JRadioButtonMenuItem menuItem = readerThemeMenuItems.get(theme);
+		if (menuItem != null && !menuItem.isSelected()) {
+			menuItem.setSelected(true);
 		}
 	}
 
@@ -203,7 +224,7 @@ public class Viewer {
 		this.htmlPane = new ContentPane(navigator);
 		JPanel contentPanel = new JPanel(new BorderLayout());
 		contentPanel.add(htmlPane, BorderLayout.CENTER);
-		this.browseBar = new BrowseBar(navigator, htmlPane);
+		this.browseBar = new BrowseBar(navigator, htmlPane, this);
 		contentPanel.add(browseBar, BorderLayout.SOUTH);
 		rightSplitPane.setLeftComponent(contentPanel);
 		rightSplitPane.setRightComponent(new MetadataPane(navigator));
@@ -376,15 +397,27 @@ public class Viewer {
 
 		viewMenu.addSeparator();
 
-		JMenu themeMenu = new JMenu(getText("Theme"));
-		ButtonGroup themeGroup = new ButtonGroup();
-		for (ViewerTheme theme : ViewerTheme.values()) {
-			JRadioButtonMenuItem themeItem = new JRadioButtonMenuItem(theme.getDisplayName(), theme == currentTheme);
-			themeItem.addActionListener(e -> setTheme(theme));
-			themeGroup.add(themeItem);
-			themeMenu.add(themeItem);
+		JMenu uiThemeMenu = new JMenu(getText("UI Theme (Window)"));
+		ButtonGroup uiThemeGroup = new ButtonGroup();
+		for (UiTheme theme : UiTheme.values()) {
+			JRadioButtonMenuItem themeItem = new JRadioButtonMenuItem(theme.getDisplayName(), theme == currentUiTheme);
+			themeItem.addActionListener(e -> setUiTheme(theme));
+			uiThemeGroup.add(themeItem);
+			uiThemeMenu.add(themeItem);
 		}
-		viewMenu.add(themeMenu);
+		viewMenu.add(uiThemeMenu);
+
+		JMenu readerThemeMenu = new JMenu(getText("Reader Theme (Page)"));
+		ButtonGroup readerThemeGroup = new ButtonGroup();
+		readerThemeMenuItems.clear();
+		for (ReaderTheme theme : ReaderTheme.values()) {
+			JRadioButtonMenuItem themeItem = new JRadioButtonMenuItem(theme.getDisplayName(), theme == currentReaderTheme);
+			themeItem.addActionListener(e -> setReaderTheme(theme));
+			readerThemeGroup.add(themeItem);
+			readerThemeMenu.add(themeItem);
+			readerThemeMenuItems.put(theme, themeItem);
+		}
+		viewMenu.add(readerThemeMenu);
 
 		JMenu bookmarkMenu = new JMenu(getText("Bookmarks"));
 		menuBar.add(bookmarkMenu);
