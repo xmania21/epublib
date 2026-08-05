@@ -9,7 +9,6 @@ import java.io.Writer;
 import nl.siegmann.epublib.Constants;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Resource;
-import nl.siegmann.epublib.epub.BookProcessor;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -22,7 +21,7 @@ import org.slf4j.LoggerFactory;
  * @author paul
  *
  */
-public class TextReplaceBookProcessor extends HtmlBookProcessor implements BookProcessor {
+public class TextReplaceBookProcessor extends HtmlBookProcessor {
 
 	@SuppressWarnings("unused")
 	private final static Logger log = LoggerFactory.getLogger(TextReplaceBookProcessor.class);

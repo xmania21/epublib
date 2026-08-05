@@ -18,7 +18,7 @@ public class NoCloseOutputStreamTest {
 
 	@BeforeEach
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 		this.noCloseOutputStream = new NoCloseOutputStream(outputStream);
 	}
 

@@ -3,7 +3,6 @@ package nl.siegmann.epublib.viewer;
 import java.awt.Image;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;

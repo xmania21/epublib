@@ -8,7 +8,6 @@ import java.io.Writer;
 import nl.siegmann.epublib.Constants;
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Resource;
-import nl.siegmann.epublib.epub.BookProcessor;
 import nl.siegmann.epublib.util.NoCloseWriter;
 
 import org.htmlcleaner.CleanerProperties;
@@ -26,8 +25,7 @@ import org.slf4j.LoggerFactory;
  * @deprecated Use {@link nl.siegmann.epublib.html.jsoup.JsoupHtmlProcessor} instead.
  */
 @Deprecated(since = "4.0", forRemoval = true)
-public class HtmlCleanerBookProcessor extends HtmlBookProcessor implements
-		BookProcessor {
+public class HtmlCleanerBookProcessor extends HtmlBookProcessor {
 
 	@SuppressWarnings("unused")
 	private final static Logger log = LoggerFactory.getLogger(HtmlCleanerBookProcessor.class);

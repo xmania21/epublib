@@ -9,12 +9,10 @@ import java.awt.GraphicsEnvironment;
 import java.awt.datatransfer.DataFlavor;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,19 +30,13 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.TransferHandler;
-import javax.swing.UIManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import nl.siegmann.epublib.browsersupport.NavigationHistory;
 import nl.siegmann.epublib.browsersupport.Navigator;
 import nl.siegmann.epublib.domain.Book;
-import nl.siegmann.epublib.epub.BookProcessor;
-import nl.siegmann.epublib.epub.BookProcessorPipeline;
 import nl.siegmann.epublib.epub.EpubReader;
 import nl.siegmann.epublib.epub.EpubWriter;
 
-import com.formdev.flatlaf.FlatLightLaf;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,15 +47,12 @@ public class Viewer {
 	private final JFrame mainWindow;
 	private BrowseBar browseBar;
 	private JSplitPane mainSplitPane; 
-	private JSplitPane leftSplitPane;
 	private JSplitPane rightSplitPane;
 	private ContentPane htmlPane;
 	private UiTheme currentUiTheme = UiTheme.LIGHT;
 	private ReaderTheme currentReaderTheme = ReaderTheme.LIGHT;
 	private Map<ReaderTheme, JRadioButtonMenuItem> readerThemeMenuItems = new HashMap<>();
 	private Navigator navigator = new Navigator();
-	private NavigationHistory browserHistory;
-	private BookProcessorPipeline epubCleaner = new BookProcessorPipeline(Collections.<BookProcessor>emptyList());
 	
 	private JTabbedPane leftTabbedPane;
 	private BookmarkPane bookmarkPane;

@@ -20,7 +20,6 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 import javax.swing.text.html.HTML.Tag;
-import javax.swing.text.html.HTMLEditorKit.Parser;
 
 /**
  * Wraps a HTMLEditorKit so we can make getParser() public.

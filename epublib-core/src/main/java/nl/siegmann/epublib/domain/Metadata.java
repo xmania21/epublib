@@ -130,12 +130,10 @@ public class Metadata implements Serializable {
 		if (titles == null || titles.isEmpty()) {
 			return "";
 		}
-		for (String title: titles) {
-			if (StringUtil.isNotBlank(title)) {
-				return title;
-			}
-		}
-		return "";
+		return titles.stream()
+				.filter(StringUtil::isNotBlank)
+				.findFirst()
+				.orElse("");
 	}
 	
 	
@@ -217,12 +215,11 @@ public class Metadata implements Serializable {
 	}
 
 	public RenditionLayout getRenditionLayout() {
-		for (Map.Entry<javax.xml.namespace.QName, String> entry : otherProperties.entrySet()) {
-			if ("rendition:layout".equalsIgnoreCase(entry.getKey().getLocalPart())) {
-				return RenditionLayout.fromValue(entry.getValue());
-			}
-		}
-		return null;
+		return otherProperties.entrySet().stream()
+				.filter(entry -> "rendition:layout".equalsIgnoreCase(entry.getKey().getLocalPart()))
+				.map(entry -> RenditionLayout.fromValue(entry.getValue()))
+				.findFirst()
+				.orElse(null);
 	}
 
 	public void setRenditionLayout(RenditionLayout layout) {

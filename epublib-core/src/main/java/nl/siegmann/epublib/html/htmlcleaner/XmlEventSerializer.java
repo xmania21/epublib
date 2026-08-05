@@ -1,6 +1,5 @@
 package nl.siegmann.epublib.html.htmlcleaner;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -50,11 +49,10 @@ public class XmlEventSerializer implements XMLEventReader {
         String tagName = tagNode.getName();
         
         writer.writeStartElement(tagName);
-        Map tagAtttributes = tagNode.getAttributes();
-        for(Iterator it = tagAtttributes.entrySet().iterator();it.hasNext();) {
-            Map.Entry entry = (Map.Entry) it.next();
-            String attName = (String) entry.getKey();
-            String attValue = (String) entry.getValue();
+        Map<String, String> tagAttributes = tagNode.getAttributes();
+        for (Map.Entry<String, String> entry : tagAttributes.entrySet()) {
+            String attName = entry.getKey();
+            String attValue = entry.getValue();
             
             if ( !props.isNamespacesAware() && ("xmlns".equals(attName) || attName.startsWith("xmlns:")) ) {
             	continue;
@@ -67,11 +65,10 @@ public class XmlEventSerializer implements XMLEventReader {
         String tagName = tagNode.getName();
         
         writer.writeEmptyElement(tagName);
-        Map tagAtttributes = tagNode.getAttributes();
-        for(Iterator it = tagAtttributes.entrySet().iterator();it.hasNext();) {
-            Map.Entry entry = (Map.Entry) it.next();
-            String attName = (String) entry.getKey();
-            String attValue = (String) entry.getValue();
+        Map<String, String> tagAttributes = tagNode.getAttributes();
+        for (Map.Entry<String, String> entry : tagAttributes.entrySet()) {
+            String attName = entry.getKey();
+            String attValue = entry.getValue();
             
             if ( !props.isNamespacesAware() && ("xmlns".equals(attName) || attName.startsWith("xmlns:")) ) {
             	continue;
@@ -91,9 +88,8 @@ public class XmlEventSerializer implements XMLEventReader {
     	} else {
 	    	serializeOpenTag(tagNode, writer);
 	
-	        List tagChildren = tagNode.getChildren();
-	        for(Iterator childrenIt = tagChildren.iterator(); childrenIt.hasNext(); ) {
-	            Object item = childrenIt.next();
+	        List<?> tagChildren = tagNode.getChildren();
+	        for (Object item : tagChildren) {
 	            if (item != null) {
 	            	serializeToken(item, writer);
 	            }

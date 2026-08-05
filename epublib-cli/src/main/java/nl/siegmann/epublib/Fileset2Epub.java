@@ -135,7 +135,7 @@ public class Fileset2Epub {
 		for (String bookProcessorName: bookProcessorNames) {
 			BookProcessor bookProcessor = null;
 			try {
-				bookProcessor = (BookProcessor) Class.forName(bookProcessorName).newInstance();
+				bookProcessor = (BookProcessor) Class.forName(bookProcessorName).getDeclaredConstructor().newInstance();
 				result.add(bookProcessor);
 			} catch (Exception e) {
 				e.printStackTrace();

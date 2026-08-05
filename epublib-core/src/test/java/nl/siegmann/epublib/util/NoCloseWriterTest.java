@@ -18,7 +18,7 @@ public class NoCloseWriterTest {
 
 	@BeforeEach
 	public void setUp() {
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 		this.noCloseWriter = new NoCloseWriter(delegateWriter);
 	}
 

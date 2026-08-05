@@ -81,12 +81,13 @@ public class TableOfContents implements Serializable {
 	 * @return null if not found.
 	 */
 	private static TOCReference findTocReferenceByTitle(String title, List<TOCReference> tocReferences) {
-		for (TOCReference tocReference: tocReferences) {
-			if (title.equals(tocReference.getTitle())) {
-				return tocReference;
-			}
+		if (tocReferences == null) {
+			return null;
 		}
-		return null;
+		return tocReferences.stream()
+				.filter(tocReference -> title.equals(tocReference.getTitle()))
+				.findFirst()
+				.orElse(null);
 	}
 
 	/**
@@ -230,11 +231,12 @@ public class TableOfContents implements Serializable {
 	}
 	
 	private static int getTotalSize(Collection<TOCReference> tocReferences) {
-		int result = tocReferences.size();
-		for (TOCReference tocReference: tocReferences) {
-			result += getTotalSize(tocReference.getChildren());
+		if (tocReferences == null) {
+			return 0;
 		}
-		return result;
+		return tocReferences.size() + tocReferences.stream()
+				.mapToInt(tocReference -> getTotalSize(tocReference.getChildren()))
+				.sum();
 	}
 	
 	/**
@@ -246,13 +248,13 @@ public class TableOfContents implements Serializable {
 	}
 
 	private int calculateDepth(List<TOCReference> tocReferences, int currentDepth) {
-		int maxChildDepth = 0;
-		for (TOCReference tocReference: tocReferences) {
-			int childDepth = calculateDepth(tocReference.getChildren(), 1);
-			if (childDepth > maxChildDepth) {
-				maxChildDepth = childDepth;
-			}
+		if (tocReferences == null || tocReferences.isEmpty()) {
+			return currentDepth;
 		}
+		int maxChildDepth = tocReferences.stream()
+				.mapToInt(tocReference -> calculateDepth(tocReference.getChildren(), 1))
+				.max()
+				.orElse(0);
 		return currentDepth + maxChildDepth;
 	}
 }

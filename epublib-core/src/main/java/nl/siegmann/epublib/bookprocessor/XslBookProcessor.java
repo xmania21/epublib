@@ -2,7 +2,6 @@ package nl.siegmann.epublib.bookprocessor;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -21,15 +20,12 @@ import javax.xml.transform.stream.StreamSource;
 
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Resource;
-import nl.siegmann.epublib.epub.BookProcessor;
 import nl.siegmann.epublib.epub.EpubProcessorSupport;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 
 /**
@@ -38,7 +34,7 @@ import org.xml.sax.SAXException;
  * @author paul
  *
  */
-public class XslBookProcessor extends HtmlBookProcessor implements BookProcessor {
+public class XslBookProcessor extends HtmlBookProcessor {
 
 	private final static Logger log = LoggerFactory.getLogger(XslBookProcessor.class); 
 
