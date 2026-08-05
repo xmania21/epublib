@@ -6,10 +6,10 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
-import net.sf.jazzlib.ZipEntry;
-import net.sf.jazzlib.ZipException;
-import net.sf.jazzlib.ZipFile;
-import net.sf.jazzlib.ZipInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 import nl.siegmann.epublib.domain.LazyResource;
 import nl.siegmann.epublib.domain.MediaType;
 import nl.siegmann.epublib.domain.Resource;

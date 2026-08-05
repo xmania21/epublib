@@ -10,8 +10,8 @@ import java.io.UnsupportedEncodingException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sf.jazzlib.ZipEntry;
-import net.sf.jazzlib.ZipInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import nl.siegmann.epublib.Constants;
 import nl.siegmann.epublib.domain.MediaType;
 import nl.siegmann.epublib.domain.Resource;

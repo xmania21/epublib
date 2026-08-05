@@ -1,8 +1,8 @@
 package nl.siegmann.epublib.epub;
 
-import net.sf.jazzlib.ZipException;
-import net.sf.jazzlib.ZipFile;
-import net.sf.jazzlib.ZipInputStream;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 import nl.siegmann.epublib.domain.LazyResource;
 import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.domain.Resources;
@@ -59,26 +59,34 @@ public class ResourcesLoaderTest {
 	 * Loads the Resources from a zero length file, using ZipInputStream<br/>
 	 * See <a href="https://github.com/psiegman/epublib/issues/122">Issue #122 Infinite loop</a>.
 	 */
-	@Test(expected = ZipException.class)
+	@Test
 	public void testLoadResources_ZipInputStream_WithZeroLengthFile() throws IOException {
 		// given
 		ZipInputStream zipInputStream = new ZipInputStream(this.getClass().getResourceAsStream("/zero_length_file.epub"));
 
 		// when
-		ResourcesLoader.loadResources(zipInputStream, encoding);
+		Resources resources = ResourcesLoader.loadResources(zipInputStream, encoding);
+
+		// then
+		Assert.assertNotNull(resources);
+		Assert.assertTrue(resources.isEmpty());
 	}
 
 	/**
 	 * Loads the Resources from a file that is not a valid zip, using ZipInputStream<br/>
 	 * See <a href="https://github.com/psiegman/epublib/issues/122">Issue #122 Infinite loop</a>.
 	 */
-	@Test(expected = ZipException.class)
+	@Test
 	public void testLoadResources_ZipInputStream_WithInvalidFile() throws IOException {
 		// given
 		ZipInputStream zipInputStream = new ZipInputStream(this.getClass().getResourceAsStream("/not_a_zip.epub"));
 
 		// when
-		ResourcesLoader.loadResources(zipInputStream, encoding);
+		Resources resources = ResourcesLoader.loadResources(zipInputStream, encoding);
+
+		// then
+		Assert.assertNotNull(resources);
+		Assert.assertTrue(resources.isEmpty());
 	}
 
 	/**
