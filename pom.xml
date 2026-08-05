@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
@@ -15,7 +14,7 @@
 	<inceptionYear>2009</inceptionYear>
 
 	<properties>
-        <epublib.version>4.0</epublib.version>
+		<epublib.version>4.0</epublib.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<slf4j.version>2.0.12</slf4j.version>
 		<junit-jupiter.version>5.10.2</junit-jupiter.version>
@@ -33,9 +32,9 @@
 	</properties>
 
 	<modules>
-		<module>../epublib-core</module>
-		<module>../epublib-cli</module>
-		<module>../epublib-viewer</module>
+		<module>epublib-core</module>
+		<module>epublib-cli</module>
+		<module>epublib-viewer</module>
 	</modules>
 
 	<licenses>

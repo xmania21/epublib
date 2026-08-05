@@ -4,7 +4,6 @@
     <artifactId>epublib-parent</artifactId>
     <groupId>nl.siegmann.epublib</groupId>
     <version>4.0</version>
-    <relativePath>../epublib-parent/pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>nl.siegmann.epublib</groupId>
