@@ -1,0 +1,10 @@
+nl\siegmann\epublib\fileset\FilesetBookCreator.class
+nl\siegmann\epublib\util\ToolsResourceUtil.class
+nl\siegmann\epublib\chm\ChmParser.class
+nl\siegmann\epublib\utilities\HtmlSplitter.class
+nl\siegmann\epublib\utilities\NumberSayer.class
+nl\siegmann\epublib\chm\package-info.class
+nl\siegmann\epublib\fileset\FilesetBookCreator$1.class
+nl\siegmann\epublib\util\VFSUtil.class
+nl\siegmann\epublib\chm\HHCParser.class
+nl\siegmann\epublib\Fileset2Epub.class

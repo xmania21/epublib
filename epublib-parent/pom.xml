@@ -34,7 +34,8 @@
 
 	<modules>
 		<module>../epublib-core</module>
-		<module>../epublib-tools</module>
+		<module>../epublib-cli</module>
+		<module>../epublib-viewer</module>
 	</modules>
 
 	<licenses>
