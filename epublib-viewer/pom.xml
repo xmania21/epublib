@@ -14,7 +14,7 @@
 	<parent>
 		<groupId>nl.siegmann.epublib</groupId>
 		<artifactId>epublib-parent</artifactId>
-		<version>4.0</version>
+		<version>5.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -24,11 +24,13 @@
 			<artifactId>epublib-core</artifactId>
 			<version>${epublib.version}</version>
 		</dependency>
+		<!-- FlatLaf for modern Swing look-and-feel (current Swing viewer) -->
 		<dependency>
 			<groupId>com.formdev</groupId>
 			<artifactId>flatlaf</artifactId>
 			<version>3.4.1</version>
 		</dependency>
+		<!-- Testing -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>
@@ -46,13 +48,16 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+				<configuration>
+					<release>${maven.compiler.release}</release>
+				</configuration>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.3.1</version>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>

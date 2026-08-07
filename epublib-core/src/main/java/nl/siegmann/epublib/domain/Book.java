@@ -239,5 +239,173 @@ public class Book implements Serializable {
 	public Resource getNcxResource() {
 		return ncxResource;
 	}
-}
 
+	/**
+	 * Creates a new {@link Builder} for constructing a {@link Book} with a fluent API.
+	 *
+	 * <p>Example usage:</p>
+	 * <pre>
+	 *     Book book = Book.builder()
+	 *         .title("My Book")
+	 *         .author(new Author("Jane", "Doe"))
+	 *         .coverImage(Resource.fromClasspath("/covers/cover.jpg", "cover.jpg"))
+	 *         .addSection("Chapter 1", chapter1Resource)
+	 *         .build();
+	 * </pre>
+	 *
+	 * @return a new Builder instance
+	 * @since 5.0
+	 */
+	public static Builder builder() {
+		return new Builder();
+	}
+
+	/**
+	 * Fluent builder for {@link Book}.
+	 *
+	 * <p>All fields are optional. The underlying {@link Book} mutable API remains
+	 * available for post-build modifications.</p>
+	 *
+	 * @since 5.0
+	 */
+	public static final class Builder {
+
+		private final Book book = new Book();
+
+		private Builder() {
+		}
+
+		/**
+		 * Sets the primary title of the book.
+		 *
+		 * @param title the book title
+		 * @return this builder
+		 */
+		public Builder title(String title) {
+			book.getMetadata().addTitle(title);
+			return this;
+		}
+
+		/**
+		 * Adds an author to the book's metadata.
+		 *
+		 * @param author the author to add
+		 * @return this builder
+		 */
+		public Builder author(Author author) {
+			book.getMetadata().addAuthor(author);
+			return this;
+		}
+
+		/**
+		 * Sets the language of the book (IETF BCP 47 tag, e.g. {@code "en"}).
+		 *
+		 * @param language the language code
+		 * @return this builder
+		 */
+		public Builder language(String language) {
+			book.getMetadata().setLanguage(language);
+			return this;
+		}
+
+		/**
+		 * Sets the primary book identifier.
+		 *
+		 * @param identifier the book identifier
+		 * @return this builder
+		 */
+		public Builder identifier(Identifier identifier) {
+			book.getMetadata().addIdentifier(identifier);
+			return this;
+		}
+
+		/**
+		 * Sets the cover image of the book.
+		 *
+		 * @param coverImage the cover image resource
+		 * @return this builder
+		 */
+		public Builder coverImage(Resource coverImage) {
+			book.setCoverImage(coverImage);
+			return this;
+		}
+
+		/**
+		 * Sets the cover page (an XHTML page containing the cover image).
+		 *
+		 * @param coverPage the cover page resource
+		 * @return this builder
+		 */
+		public Builder coverPage(Resource coverPage) {
+			book.setCoverPage(coverPage);
+			return this;
+		}
+
+		/**
+		 * Adds a top-level section to the book's spine and table of contents.
+		 *
+		 * @param title    the section title
+		 * @param resource the section content resource
+		 * @return this builder
+		 */
+		public Builder addSection(String title, Resource resource) {
+			book.addSection(title, resource);
+			return this;
+		}
+
+		/**
+		 * Adds a child section under an existing parent section.
+		 *
+		 * @param parent   the parent TOC reference
+		 * @param title    the section title
+		 * @param resource the section content resource
+		 * @return this builder
+		 */
+		public Builder addSection(TOCReference parent, String title, Resource resource) {
+			book.addSection(parent, title, resource);
+			return this;
+		}
+
+		/**
+		 * Adds a resource (image, CSS, font, etc.) to the book's manifest.
+		 *
+		 * @param resource the resource to add
+		 * @return this builder
+		 */
+		public Builder addResource(Resource resource) {
+			book.addResource(resource);
+			return this;
+		}
+
+		/**
+		 * Adds a publisher to the book's metadata.
+		 *
+		 * @param publisher the publisher name
+		 * @return this builder
+		 */
+		public Builder publisher(String publisher) {
+			book.getMetadata().addPublisher(publisher);
+			return this;
+		}
+
+		/**
+		 * Adds a description to the book's metadata.
+		 *
+		 * @param description the book description
+		 * @return this builder
+		 */
+		public Builder description(String description) {
+			book.getMetadata().addDescription(description);
+			return this;
+		}
+
+		/**
+		 * Builds and returns the configured {@link Book}.
+		 *
+		 * @return the built Book
+		 */
+		public Book build() {
+			return book;
+		}
+	}
+}

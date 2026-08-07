@@ -47,6 +47,34 @@ public class Identifier implements Serializable {
 	}
 
 	/**
+	 * Creates an Identifier with the given scheme and value.
+	 *
+	 * @param scheme the identifier scheme (e.g. {@link Scheme#ISBN}, {@link Scheme#UUID})
+	 * @param value  the identifier value
+	 * @return a new Identifier instance
+	 * @since 5.0
+	 */
+	public static Identifier of(String scheme, String value) {
+		return new Identifier(scheme, value);
+	}
+
+	/**
+	 * Creates an Identifier with the given scheme, value, and book-id flag.
+	 *
+	 * @param scheme  the identifier scheme
+	 * @param value   the identifier value
+	 * @param bookId  whether this identifier is the primary book identifier
+	 * @return a new Identifier instance
+	 * @since 5.0
+	 */
+	public static Identifier of(String scheme, String value, boolean bookId) {
+		Identifier id = new Identifier(scheme, value);
+		id.setBookId(bookId);
+		return id;
+	}
+
+
+	/**
 	 * The first identifier for which the bookId is true is made the bookId identifier.
 	 * If no identifier has bookId == true then the first bookId identifier is written as the primary.
 	 * 

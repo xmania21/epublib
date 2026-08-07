@@ -14,7 +14,7 @@
 	<parent>
 		<groupId>nl.siegmann.epublib</groupId>
 		<artifactId>epublib-parent</artifactId>
-		<version>4.0</version>
+		<version>5.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -24,10 +24,17 @@
 			<artifactId>epublib-core</artifactId>
 			<version>${epublib.version}</version>
 		</dependency>
+		<!-- commons-vfs2 replaces commons-vfs 1.0 -->
 		<dependency>
-			<groupId>commons-vfs</groupId>
-			<artifactId>commons-vfs</artifactId>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-vfs2</artifactId>
 		</dependency>
+		<!-- PicoCLI for modern CLI subcommands (Phase 2) -->
+		<dependency>
+			<groupId>info.picocli</groupId>
+			<artifactId>picocli</artifactId>
+		</dependency>
+		<!-- Testing -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>
@@ -45,13 +52,19 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+				<configuration>
+					<release>${maven.compiler.release}</release>
+				</configuration>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.3.1</version>
+				<configuration>
+					<argLine>-Dnet.bytebuddy.experimental=true --add-opens java.base/java.io=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED</argLine>
+				</configuration>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>

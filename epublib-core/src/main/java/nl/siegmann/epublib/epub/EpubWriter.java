@@ -15,6 +15,7 @@ import org.xmlpull.v1.XmlSerializer;
 
 import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.Resource;
+import nl.siegmann.epublib.exception.EpubWriteException;
 import nl.siegmann.epublib.service.MediatypeService;
 import nl.siegmann.epublib.util.IOUtil;
 
@@ -62,9 +63,8 @@ public class EpubWriter {
 	}
 
 	private void initTOCResource(Book book) {
-		Resource tocResource;
 		try {
-			tocResource = NCXDocument.createNCXResource(book);
+			Resource tocResource = NCXDocument.createNCXResource(book);
 			Resource currentTocResource = book.getSpine().getTocResource();
 			if (currentTocResource != null) {
 				book.getResources().remove(currentTocResource.getHref());
@@ -72,7 +72,7 @@ public class EpubWriter {
 			book.getSpine().setTocResource(tocResource);
 			book.getResources().add(tocResource);
 		} catch (Exception e) {
-			log.error("Error writing table of contents: " + e.getClass().getName() + ": " + e.getMessage());
+			throw new EpubWriteException("Failed to generate NCX table of contents resource: " + e.getMessage(), e);
 		}
 	}
 	

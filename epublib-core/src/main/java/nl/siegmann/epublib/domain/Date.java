@@ -73,6 +73,32 @@ public class Date implements Serializable {
 		this.dateString = dateString;
 	}
 
+	/**
+	 * Creates a Date with the given date string and event type.
+	 *
+	 * @param dateString the date string (e.g. {@code "2024-01-15"})
+	 * @param event      the event type
+	 * @return a new Date instance
+	 * @since 5.0
+	 */
+	public static Date of(String dateString, Event event) {
+		return new Date(dateString, event);
+	}
+
+	/**
+	 * Creates a Date with the given date string and event string.
+	 * The event string is matched case-insensitively against {@link Event} values.
+	 *
+	 * @param dateString the date string (e.g. {@code "2024-01-15"})
+	 * @param event      the event string (e.g. {@code "publication"})
+	 * @return a new Date instance
+	 * @since 5.0
+	 */
+	public static Date of(String dateString, String event) {
+		return new Date(dateString, event);
+	}
+
+
 	private static String checkDate(String dateString) {
 		if (dateString == null) {
 			throw new IllegalArgumentException("Cannot create a date from a blank string");

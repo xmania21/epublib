@@ -137,15 +137,72 @@ public class Resource implements Serializable {
 		this.inputEncoding = inputEncoding;
 		this.data = data;
 	}
-	
+
+	// -------------------------------------------------------------------------
+	// Static factory methods (5.0+)
+	// -------------------------------------------------------------------------
+
+	/**
+	 * Creates a Resource from a byte array at the specified href.
+	 * The MediaType is determined from the href extension.
+	 *
+	 * @param data the resource data
+	 * @param href the location within the epub (e.g. {@code "chapter1.html"})
+	 * @return a new Resource
+	 * @since 5.0
+	 */
+	public static Resource fromBytes(byte[] data, String href) {
+		return new Resource(data, href);
+	}
+
+	/**
+	 * Creates a Resource by reading all bytes from the given InputStream.
+	 * The MediaType is determined from the href extension.
+	 *
+	 * <p>The stream is fully consumed and closed after this call.</p>
+	 *
+	 * @param in   the input stream to read from
+	 * @param href the location within the epub (e.g. {@code "images/cover.jpg"})
+	 * @return a new Resource
+	 * @throws java.io.IOException if the stream cannot be read
+	 * @since 5.0
+	 */
+	public static Resource fromStream(InputStream in, String href) throws java.io.IOException {
+		return new Resource(in, href);
+	}
+
+	/**
+	 * Creates a Resource by reading a classpath resource.
+	 *
+	 * <p>Useful in tests and examples:</p>
+	 * <pre>
+	 *     Resource cover = Resource.fromClasspath("/covers/cover.jpg", "cover.jpg");
+	 * </pre>
+	 *
+	 * @param classpathName the classpath path of the resource (e.g. {@code "/book1/chapter1.html"})
+	 * @param href          the location within the epub
+	 * @return a new Resource
+	 * @throws java.io.IOException          if the classpath resource cannot be read
+	 * @throws IllegalArgumentException if the classpath resource is not found
+	 * @since 5.0
+	 */
+	public static Resource fromClasspath(String classpathName, String href) throws java.io.IOException {
+		InputStream in = Resource.class.getResourceAsStream(classpathName);
+		if (in == null) {
+			throw new IllegalArgumentException("Classpath resource not found: " + classpathName);
+		}
+		return new Resource(in, href);
+	}
+
+
 	/**
 	 * Gets the contents of the Resource as an InputStream.
-	 * 
+	 *
 	 * @return The contents of the Resource.
-	 * 
 	 * @throws IOException
 	 */
 	public InputStream getInputStream() throws IOException {
+
 		return new ByteArrayInputStream(getData());
 	}
 	

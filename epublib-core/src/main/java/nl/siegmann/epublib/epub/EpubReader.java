@@ -12,6 +12,7 @@ import nl.siegmann.epublib.domain.Book;
 import nl.siegmann.epublib.domain.MediaType;
 import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.domain.Resources;
+import nl.siegmann.epublib.exception.EpubReadException;
 import nl.siegmann.epublib.service.MediatypeService;
 import nl.siegmann.epublib.util.ResourceUtil;
 import nl.siegmann.epublib.util.StringUtil;
@@ -128,7 +129,10 @@ public class EpubReader {
 		try {
 			PackageDocumentReader.read(packageResource, this, book, resources);
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			throw new EpubReadException(
+					"Failed to read package document at '" + packageResourceHref + "': " + e.getMessage(),
+					packageResourceHref,
+					e);
 		}
 		return packageResource;
 	}
@@ -146,7 +150,8 @@ public class EpubReader {
 			Element rootFileElement = (Element) ((Element) document.getDocumentElement().getElementsByTagName("rootfiles").item(0)).getElementsByTagName("rootfile").item(0);
 			result = rootFileElement.getAttribute("full-path");
 		} catch (Exception e) {
-			log.error(e.getMessage(), e);
+			log.warn("Failed to parse META-INF/container.xml, falling back to default OPF path '{}': {}",
+					defaultResult, e.getMessage());
 		}
 		if(StringUtil.isBlank(result)) {
 			result = defaultResult;
