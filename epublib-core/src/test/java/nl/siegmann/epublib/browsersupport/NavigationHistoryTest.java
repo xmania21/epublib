@@ -88,7 +88,7 @@ public class NavigationHistoryTest {
 	}
 
 	@Test
-	public void test1() {
+	public void navigationHistory_basicNavigationAndDuplicates_maintainsPositionAndSize() {
 		MockSectionWalker navigator = new MockSectionWalker(new MockBook()); 
 		NavigationHistory browserHistory = new NavigationHistory(navigator);
 		
@@ -138,7 +138,7 @@ public class NavigationHistoryTest {
 	}
 	
 	@Test
-	public void test2() {
+	public void navigationHistory_addLocationInMiddleOfHistory_truncatesFutureHistory() {
 		MockSectionWalker navigator = new MockSectionWalker(new MockBook()); 
 		NavigationHistory browserHistory = new NavigationHistory(navigator);
 		
@@ -176,7 +176,7 @@ public class NavigationHistoryTest {
 	}
 	
 	@Test
-	public void test3() {
+	public void navigationHistory_moveBackwardAndForward_navigatesCorrectly() {
 		MockSectionWalker navigator = new MockSectionWalker(new MockBook()); 
 		NavigationHistory browserHistory = new NavigationHistory(navigator);
 		

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 public class NumberSayerTest {
 	@Test
-	public void test1() {
+	public void getNumberName_validNumbers_returnsName() {
 		Object[] testinput = new Object[] {
 			1, "one",
 			42, "fourtytwo",

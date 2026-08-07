@@ -18,7 +18,7 @@ import org.xml.sax.SAXException;
 public class PackageDocumentMetadataReaderTest {
 	
 	@Test	
-	public void test1() {
+	public void readMetadata_fromOpfFile_readsAuthors() {
 		try {
 			Document document = EpubProcessorSupport.createDocumentBuilder().parse(PackageDocumentMetadataReader.class.getResourceAsStream("/opf/test2.opf"));
 			Metadata metadata = PackageDocumentMetadataReader.readMetadata(document);
@@ -55,7 +55,7 @@ public class PackageDocumentMetadataReaderTest {
     }
     
 	@Test	
-    public void test2() throws SAXException, IOException {
+    public void readMetadata_fromOpfXmlString_readsTitleIdentifiersAndMeta() throws SAXException, IOException {
     	// given
     	String input = "<package version=\"2.0\" xmlns=\"http://www.idpf.org/2007/opf\" unique-identifier=\"BookId\">"
 			+ "<metadata xmlns=\"http://www.idpf.org/2007/opf\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:opf=\"http://www.idpf.org/2007/opf\">"

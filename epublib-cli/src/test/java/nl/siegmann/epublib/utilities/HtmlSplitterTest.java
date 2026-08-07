@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 public class HtmlSplitterTest {
 
 	@Test
-	public void test1() {
+	public void splitHtml_largeHtmlDocument_splitsIntoChunksWithinMaxSize() {
 		HtmlSplitter htmlSplitter = new HtmlSplitter();
 		try {
 			String bookResourceName = "/holmes_scandal_bohemia.html";
