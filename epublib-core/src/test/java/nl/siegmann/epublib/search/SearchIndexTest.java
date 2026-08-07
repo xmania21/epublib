@@ -13,25 +13,21 @@ import org.junit.jupiter.api.Test;
 public class SearchIndexTest {
 
 	@Test
-	public void testDoSearch1() {
-		try {
-			Book testBook = new Book();
-			testBook.addSection("chapter1", new Resource(new StringReader("a"), "chapter1.html"));
-			testBook.addSection("chapter2", new Resource(new StringReader("<title>ab</title>"), "chapter2.html"));
-			testBook.addSection("chapter3", new Resource(new StringReader("ba"), "chapter3.html"));
-			testBook.addSection("chapter4", new Resource(new StringReader("aa"), "chapter4.html"));
-			SearchIndex searchIndex = new SearchIndex(testBook);
-			SearchResults searchResults = searchIndex.doSearch("a");
-			Assertions.assertFalse(searchResults.isEmpty());
-			Assertions.assertEquals(5, searchResults.size());
-			Assertions.assertEquals(0, searchResults.getHits().get(0).getPagePos());
-			Assertions.assertEquals(0, searchResults.getHits().get(1).getPagePos());
-			Assertions.assertEquals(1, searchResults.getHits().get(2).getPagePos());
-			Assertions.assertEquals(0, searchResults.getHits().get(3).getPagePos());
-			Assertions.assertEquals(1, searchResults.getHits().get(4).getPagePos());
-		} catch (IOException e) {
-			Assertions.fail(e.getMessage());
-		}
+	public void doSearch_singleLetterQuery_returnsHits() throws IOException {
+		Book testBook = new Book();
+		testBook.addSection("chapter1", new Resource(new StringReader("a"), "chapter1.html"));
+		testBook.addSection("chapter2", new Resource(new StringReader("<title>ab</title>"), "chapter2.html"));
+		testBook.addSection("chapter3", new Resource(new StringReader("ba"), "chapter3.html"));
+		testBook.addSection("chapter4", new Resource(new StringReader("aa"), "chapter4.html"));
+		SearchIndex searchIndex = new SearchIndex(testBook);
+		SearchResults searchResults = searchIndex.doSearch("a");
+		Assertions.assertFalse(searchResults.isEmpty());
+		Assertions.assertEquals(5, searchResults.size());
+		Assertions.assertEquals(0, searchResults.getHits().get(0).getPagePos());
+		Assertions.assertEquals(0, searchResults.getHits().get(1).getPagePos());
+		Assertions.assertEquals(1, searchResults.getHits().get(2).getPagePos());
+		Assertions.assertEquals(0, searchResults.getHits().get(3).getPagePos());
+		Assertions.assertEquals(1, searchResults.getHits().get(4).getPagePos());
 	}
 	
 	@Test

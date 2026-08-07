@@ -16,27 +16,23 @@ import org.junit.jupiter.api.Test;
 public class HtmlSplitterTest {
 
 	@Test
-	public void splitHtml_largeHtmlDocument_splitsIntoChunksWithinMaxSize() {
+	public void splitHtml_largeHtmlDocument_splitsIntoChunksWithinMaxSize() throws Exception {
 		HtmlSplitter htmlSplitter = new HtmlSplitter();
-		try {
-			String bookResourceName = "/holmes_scandal_bohemia.html";
-			Reader input = new InputStreamReader(HtmlSplitterTest.class.getResourceAsStream(bookResourceName), Constants.CHARACTER_ENCODING);
-			int maxSize = 3000;
-			List<List<XMLEvent>> result = htmlSplitter.splitHtml(input, maxSize);
-			XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
-			for (int i = 0; i < result.size(); i++) {
-				ByteArrayOutputStream out = new ByteArrayOutputStream();
-				XMLEventWriter writer = xmlOutputFactory.createXMLEventWriter(out);
-				for (XMLEvent xmlEvent: result.get(i)) {
-					writer.add(xmlEvent);
-				}
-				writer.close();
-				byte[] data = out.toByteArray();
-				Assertions.assertTrue(data.length > 0);
-				Assertions.assertTrue(data.length <= maxSize);
+		String bookResourceName = "/holmes_scandal_bohemia.html";
+		Reader input = new InputStreamReader(HtmlSplitterTest.class.getResourceAsStream(bookResourceName), Constants.CHARACTER_ENCODING);
+		int maxSize = 3000;
+		List<List<XMLEvent>> result = htmlSplitter.splitHtml(input, maxSize);
+		XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
+		for (int i = 0; i < result.size(); i++) {
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			XMLEventWriter writer = xmlOutputFactory.createXMLEventWriter(out);
+			for (XMLEvent xmlEvent: result.get(i)) {
+				writer.add(xmlEvent);
 			}
-		} catch (Exception e) {
-			Assertions.fail(e.getMessage());
+			writer.close();
+			byte[] data = out.toByteArray();
+			Assertions.assertTrue(data.length > 0);
+			Assertions.assertTrue(data.length <= maxSize);
 		}
 	}
 }

@@ -14,39 +14,29 @@ public class DOMUtilTest {
 	public class GetAttribute {
 		
 		@Test
-		public void test_simple_foo() {
+		public void test_simple_foo() throws Exception {
 			// given
 			String input = "<?xml version=\"1.0\"?><doc xmlns:a=\"foo\" xmlns:b=\"bar\" a:myattr=\"red\" b:myattr=\"green\"/>";
-
-			try {
-				Document document = EpubProcessorSupport.createDocumentBuilder().parse(new InputSource(new StringReader(input)));
-				
-				// when
-				String actualResult = DOMUtil.getAttribute(document.getDocumentElement(), "foo", "myattr");
-				
-				// then
-				assertEquals("red", actualResult);
-			} catch (Exception e) {
-				fail(e.getMessage());
-			}
+			Document document = EpubProcessorSupport.createDocumentBuilder().parse(new InputSource(new StringReader(input)));
+			
+			// when
+			String actualResult = DOMUtil.getAttribute(document.getDocumentElement(), "foo", "myattr");
+			
+			// then
+			assertEquals("red", actualResult);
 		}
 		
 		@Test
-		public void test_simple_bar() {
+		public void test_simple_bar() throws Exception {
 			// given
 			String input = "<?xml version=\"1.0\"?><doc xmlns:a=\"foo\" xmlns:b=\"bar\" a:myattr=\"red\" b:myattr=\"green\"/>";
-
-			try {
-				Document document = EpubProcessorSupport.createDocumentBuilder().parse(new InputSource(new StringReader(input)));
-				
-				// when
-				String actualResult = DOMUtil.getAttribute(document.getDocumentElement(), "bar", "myattr");
-				
-				// then
-				assertEquals("green", actualResult);
-			} catch (Exception e) {
-				fail(e.getMessage());
-			}
+			Document document = EpubProcessorSupport.createDocumentBuilder().parse(new InputSource(new StringReader(input)));
+			
+			// when
+			String actualResult = DOMUtil.getAttribute(document.getDocumentElement(), "bar", "myattr");
+			
+			// then
+			assertEquals("green", actualResult);
 		}
 	}
 }

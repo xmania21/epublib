@@ -14,48 +14,33 @@ import org.junit.jupiter.api.Test;
 public class IOUtilTest {
 
 	@Test
-	public void testToByteArray1() {
+	public void toByteArray_smallArray_returnsEqualByteArray() throws IOException {
 		byte[] testArray = new byte[Byte.MAX_VALUE - Byte.MIN_VALUE];
 		for (int i = Byte.MIN_VALUE; i < Byte.MAX_VALUE; i++) {
 			testArray[i - Byte.MIN_VALUE] = (byte) i;
 		}
-		try {
-			byte[] result = IOUtil.toByteArray(new ByteArrayInputStream(testArray));
-			assertTrue(Arrays.equals(testArray, result));
-		} catch (IOException e) {
-			e.printStackTrace();
-			assertTrue(false);
-		}
+		byte[] result = IOUtil.toByteArray(new ByteArrayInputStream(testArray));
+		assertTrue(Arrays.equals(testArray, result));
 	}
 
 	@Test
-	public void testToByteArray2() {
+	public void toByteArray_largeArray_returnsEqualByteArray() throws IOException {
 		byte[] testArray = new byte[IOUtil.IO_COPY_BUFFER_SIZE + 1];
 		Random random = new Random();
 		random.nextBytes(testArray);
-		try {
-			byte[] result = IOUtil.toByteArray(new ByteArrayInputStream(testArray));
-			assertTrue(Arrays.equals(testArray, result));
-		} catch (IOException e) {
-			e.printStackTrace();
-			assertTrue(false);
-		}
+		byte[] result = IOUtil.toByteArray(new ByteArrayInputStream(testArray));
+		assertTrue(Arrays.equals(testArray, result));
 	}
 
 	@Test
-	public void testCopyInputStream1() {
+	public void copy_inputStreamToOutputStream_copiesEntireContent() throws IOException {
 		byte[] testArray = new byte[(IOUtil.IO_COPY_BUFFER_SIZE * 3) + 10];
 		Random random = new Random();
 		random.nextBytes(testArray);
-		try {
-			ByteArrayOutputStream result = new ByteArrayOutputStream();
-			int copySize = IOUtil.copy(new ByteArrayInputStream(testArray), result);
-			assertTrue(Arrays.equals(testArray, result.toByteArray()));
-			assertEquals(testArray.length, copySize);
-		} catch (IOException e) {
-			e.printStackTrace();
-			assertTrue(false);
-		}
+		ByteArrayOutputStream result = new ByteArrayOutputStream();
+		int copySize = IOUtil.copy(new ByteArrayInputStream(testArray), result);
+		assertTrue(Arrays.equals(testArray, result.toByteArray()));
+		assertEquals(testArray.length, copySize);
 	}
 	
 	@Test

@@ -18,40 +18,27 @@ import org.xml.sax.SAXException;
 public class PackageDocumentMetadataReaderTest {
 	
 	@Test	
-	public void readMetadata_fromOpfFile_readsAuthors() {
-		try {
-			Document document = EpubProcessorSupport.createDocumentBuilder().parse(PackageDocumentMetadataReader.class.getResourceAsStream("/opf/test2.opf"));
-			Metadata metadata = PackageDocumentMetadataReader.readMetadata(document);
-			assertEquals(1, metadata.getAuthors().size());
-		} catch (Exception e) {
-			e.printStackTrace();
-			assertTrue(false);
-		}
+	public void readMetadata_fromOpfFile_readsAuthors() throws Exception {
+		Document document = EpubProcessorSupport.createDocumentBuilder().parse(PackageDocumentMetadataReader.class.getResourceAsStream("/opf/test2.opf"));
+		Metadata metadata = PackageDocumentMetadataReader.readMetadata(document);
+		assertEquals(1, metadata.getAuthors().size());
 	}
 
 	@Test	
-    public void testReadsLanguage() {
+    public void testReadsLanguage() throws Exception {
         Metadata metadata = getMetadata("/opf/test_language.opf");
         assertEquals("fi", metadata.getLanguage());
     }
 
 	@Test	
-    public void testDefaultsToEnglish() {
+    public void testDefaultsToEnglish() throws Exception {
         Metadata metadata = getMetadata("/opf/test_default_language.opf");
         assertEquals("en", metadata.getLanguage());
     }
 
-    private Metadata getMetadata(String file) {
-        try {
-            Document document = EpubProcessorSupport.createDocumentBuilder().parse(PackageDocumentMetadataReader.class.getResourceAsStream(file));
-
-            return PackageDocumentMetadataReader.readMetadata(document);
-        } catch (Exception e) {
-            e.printStackTrace();
-            assertTrue(false);
-
-            return null;
-        }
+    private Metadata getMetadata(String file) throws Exception {
+        Document document = EpubProcessorSupport.createDocumentBuilder().parse(PackageDocumentMetadataReader.class.getResourceAsStream(file));
+        return PackageDocumentMetadataReader.readMetadata(document);
     }
     
 	@Test	

@@ -18,51 +18,37 @@ import org.junit.jupiter.api.Test;
 public class FilesetBookCreatorTest {
 
 	@Test
-	public void createBookFromDirectory_singleChapterFile_createsBook() {
-		try {
-			FileSystemManager fsManager = VFS.getManager();
-			FileObject dir = fsManager.resolveFile("ram://test-dir");
-			dir.createFolder();
-			FileObject chapter1 = dir.resolveFile("chapter1.html", NameScope.CHILD);
-			chapter1.createFile();
-			IOUtils.copy(this.getClass().getResourceAsStream("/book1/chapter1.html"), chapter1.getContent().getOutputStream());
-			Book bookFromDirectory = FilesetBookCreator.createBookFromDirectory(dir, Constants.CHARACTER_ENCODING);
-			Assertions.assertEquals(1, bookFromDirectory.getResources().size());
-			Assertions.assertEquals(1, bookFromDirectory.getSpine().size());
-			Assertions.assertEquals(1, bookFromDirectory.getTableOfContents().size());
-		} catch (Exception e) {
-			Assertions.fail(e.getMessage());
-		}
+	public void createBookFromDirectory_singleChapterFile_createsBook() throws Exception {
+		FileSystemManager fsManager = VFS.getManager();
+		FileObject dir = fsManager.resolveFile("ram://test-dir");
+		dir.createFolder();
+		FileObject chapter1 = dir.resolveFile("chapter1.html", NameScope.CHILD);
+		chapter1.createFile();
+		IOUtils.copy(this.getClass().getResourceAsStream("/book1/chapter1.html"), chapter1.getContent().getOutputStream());
+		Book bookFromDirectory = FilesetBookCreator.createBookFromDirectory(dir, Constants.CHARACTER_ENCODING);
+		Assertions.assertEquals(1, bookFromDirectory.getResources().size());
+		Assertions.assertEquals(1, bookFromDirectory.getSpine().size());
+		Assertions.assertEquals(1, bookFromDirectory.getTableOfContents().size());
 	}
 
 	@Test
-	public void createBookFromDirectory_validFiles_createsSpineAndToc() {
-		try {
-			FileObject dir = createDirWithSourceFiles();
-			Book book = FilesetBookCreator.createBookFromDirectory(dir);
-			Assertions.assertEquals(5, book.getSpine().size());
-			Assertions.assertEquals(5, book.getTableOfContents().size());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assertions.fail(e.getMessage());
-		}
+	public void createBookFromDirectory_validFiles_createsSpineAndToc() throws Exception {
+		FileObject dir = createDirWithSourceFiles();
+		Book book = FilesetBookCreator.createBookFromDirectory(dir);
+		Assertions.assertEquals(5, book.getSpine().size());
+		Assertions.assertEquals(5, book.getTableOfContents().size());
 	}
 
 	@Test
-	public void createBookFromDirectory_unsupportedFileExtension_ignoresUnsupportedFiles() {
-		try {
-			FileObject dir = createDirWithSourceFiles();
-			
-			// this file should be ignored
-			copyInputStreamToFileObject(new ByteArrayInputStream("hi".getBytes()), dir, "foo.nonsense");
-			
-			Book book = FilesetBookCreator.createBookFromDirectory(dir);
-			Assertions.assertEquals(5, book.getSpine().size());
-			Assertions.assertEquals(5, book.getTableOfContents().size());
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assertions.fail(e.getMessage());
-		}
+	public void createBookFromDirectory_unsupportedFileExtension_ignoresUnsupportedFiles() throws Exception {
+		FileObject dir = createDirWithSourceFiles();
+		
+		// this file should be ignored
+		copyInputStreamToFileObject(new ByteArrayInputStream("hi".getBytes()), dir, "foo.nonsense");
+		
+		Book book = FilesetBookCreator.createBookFromDirectory(dir);
+		Assertions.assertEquals(5, book.getSpine().size());
+		Assertions.assertEquals(5, book.getTableOfContents().size());
 	}
 
 	private FileObject createDirWithSourceFiles() throws IOException {
