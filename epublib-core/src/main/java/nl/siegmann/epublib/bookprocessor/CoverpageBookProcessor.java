@@ -32,9 +32,6 @@ import org.w3c.dom.NodeList;
  * If the book contains a cover image then this will add a cover page to the book.
  * If the book contains a cover html page it will set that page's first image as the book's cover image.
  * 
- * FIXME:
- *  will overwrite any "cover.jpg" or "cover.html" that are already there.
- *  
  * @author paul
  *
  */
@@ -120,12 +117,33 @@ public class CoverpageBookProcessor implements BookProcessor {
 	}
 	
 	private String getCoverPageHref(Book book) {
-		return DEFAULT_COVER_PAGE_HREF;
+		String href = DEFAULT_COVER_PAGE_HREF;
+		if (book.getResources() != null && book.getResources().containsByHref(href)) {
+			int counter = 1;
+			while (book.getResources().containsByHref("cover_" + counter + ".html")) {
+				counter++;
+			}
+			href = "cover_" + counter + ".html";
+		}
+		return href;
 	}
 	
 	
 	private String getCoverImageHref(Resource imageResource, Book book) {
-		return DEFAULT_COVER_IMAGE_HREF;
+		String ext = (imageResource != null && imageResource.getMediaType() != null)
+				? imageResource.getMediaType().getDefaultExtension()
+				: ".png";
+		String baseHref = "images/cover" + ext;
+		if (book.getResources() == null || !book.getResources().containsByHref(baseHref)) {
+			return baseHref;
+		}
+		int counter = 1;
+		String href = "images/cover_" + counter + ext;
+		while (book.getResources().containsByHref(href)) {
+			counter++;
+			href = "images/cover_" + counter + ext;
+		}
+		return href;
 	}
 	
 	private Resource getFirstImageSource(Resource titlePageResource, Resources resources) {
