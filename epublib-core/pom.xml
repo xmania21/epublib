@@ -11,23 +11,49 @@
 	<description>A java library for reading/writing/manipulating epub files</description>
 	<url>http://www.siegmann.nl/epublib</url>
 	<inceptionYear>2009</inceptionYear>
-	
+
 	<parent>
-    	<groupId>nl.siegmann.epublib</groupId>
+		<groupId>nl.siegmann.epublib</groupId>
 		<artifactId>epublib-parent</artifactId>
-		<version>4.0</version>
-		<relativePath>../epublib-parent/pom.xml</relativePath>
-  	</parent>
+		<version>5.0-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
 
 	<dependencies>
+		<!-- XML parsing: kxml2/xmlpull kept temporarily pending Phase 2 refactor to JDK StAX -->
 		<dependency>
-		    <groupId>net.sf.kxml</groupId>
-		    <artifactId>kxml2</artifactId>
+			<groupId>net.sf.kxml</groupId>
+			<artifactId>kxml2</artifactId>
+			<version>2.3.0</version>
 		</dependency>
 		<dependency>
-		    <groupId>xmlpull</groupId>
-		    <artifactId>xmlpull</artifactId>
+			<groupId>xmlpull</groupId>
+			<artifactId>xmlpull</artifactId>
+			<version>1.1.3.4d_b4_min</version>
 		</dependency>
+		<!-- HTML cleaning: htmlcleaner kept temporarily pending Phase 2 jsoup migration -->
+		<dependency>
+			<groupId>net.sourceforge.htmlcleaner</groupId>
+			<artifactId>htmlcleaner</artifactId>
+			<version>2.2</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.jdom</groupId>
+					<artifactId>jdom</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.ant</groupId>
+					<artifactId>ant</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- commons-lang 2.x kept for existing code; commons-lang3 added for new code -->
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.4</version>
+		</dependency>
+		<!-- Logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
@@ -36,20 +62,49 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 		</dependency>
+		<!-- jsoup: available for new code; htmlcleaner migration tracked in Phase 2 -->
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+		</dependency>
+		<!-- Commons -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+		</dependency>
+		<!-- Testing -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
+			<artifactId>mockito-core</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
+
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+				<configuration>
+					<release>${maven.compiler.release}</release>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -67,17 +122,9 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>${maven-compiler-plugin.version}</version>
-				<configuration>
-					<source>${source.version}</source>
-					<target>${target.version}</target>
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
+
 	<reporting>
 		<plugins>
 			<plugin>
@@ -87,19 +134,5 @@
 			</plugin>
 		</plugins>
 	</reporting>
-	<repositories>
-		<repository>
-			<id>maven</id>
-			<url>http://repo1.maven.org/maven2/</url>
-		</repository>
-		<repository>
-			<id>jboss</id>
-			<url>https://repository.jboss.org/nexus/</url>
-		</repository>
-		<repository>
-			<id>net.java.repository</id>
-			<name>Java.net repository</name>
-			<url>http://download.java.net/maven/2/</url>
-		</repository>
-	</repositories>
+
 </project>

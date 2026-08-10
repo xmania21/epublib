@@ -1,10 +1,10 @@
 package nl.siegmann.epublib.util;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class StringUtilTest  {
 
@@ -16,8 +16,7 @@ public class StringUtilTest  {
 			String actualResult = StringUtil
 					.defaultIfNull((String) testData[i]);
 			String expectedResult = (String) testData[i + 1];
-			assertEquals((i / 2) + " : " + testData[i], expectedResult,
-					actualResult);
+			assertEquals(expectedResult, actualResult, (i / 2) + " : " + testData[i]);
 		}
 	}
 
@@ -30,9 +29,7 @@ public class StringUtilTest  {
 			String actualResult = StringUtil.defaultIfNull(
 					(String) testData[i], (String) testData[i + 1]);
 			String expectedResult = (String) testData[i + 2];
-			assertEquals(
-					(i / 3) + " : " + testData[i] + ", " + testData[i + 1],
-					expectedResult, actualResult);
+			assertEquals(expectedResult, actualResult, (i / 3) + " : " + testData[i] + ", " + testData[i + 1]);
 		}
 	}
 
@@ -65,8 +62,7 @@ public class StringUtilTest  {
 		for (int i = 0; i < testData.length; i += 2) {
 			boolean actualResult = StringUtil.isNotBlank((String) testData[i]);
 			boolean expectedResult = (Boolean) testData[i + 1];
-			assertEquals((i / 2) + " : " + testData[i], expectedResult,
-					actualResult);
+			assertEquals(expectedResult, actualResult, (i / 2) + " : " + testData[i]);
 		}
 	}
 
@@ -80,9 +76,7 @@ public class StringUtilTest  {
 			boolean actualResult = StringUtil.equals((String) testData[i],
 					(String) testData[i + 1]);
 			boolean expectedResult = (Boolean) testData[i + 2];
-			assertEquals(
-					(i / 3) + " : " + testData[i] + ", " + testData[i + 1],
-					expectedResult, actualResult);
+			assertEquals(expectedResult, actualResult, (i / 3) + " : " + testData[i] + ", " + testData[i + 1]);
 		}
 	}
 
@@ -96,9 +90,7 @@ public class StringUtilTest  {
 			boolean actualResult = StringUtil.endsWithIgnoreCase(
 					(String) testData[i], (String) testData[i + 1]);
 			boolean expectedResult = (Boolean) testData[i + 2];
-			assertEquals(
-					(i / 3) + " : " + testData[i] + ", " + testData[i + 1],
-					expectedResult, actualResult);
+			assertEquals(expectedResult, actualResult, (i / 3) + " : " + testData[i] + ", " + testData[i + 1]);
 		}
 	}
 
@@ -110,9 +102,7 @@ public class StringUtilTest  {
 			String actualResult = StringUtil.substringBefore(
 					(String) testData[i], (Character) testData[i + 1]);
 			String expectedResult = (String) testData[i + 2];
-			assertEquals(
-					(i / 3) + " : " + testData[i] + ", " + testData[i + 1],
-					expectedResult, actualResult);
+			assertEquals(expectedResult, actualResult, (i / 3) + " : " + testData[i] + ", " + testData[i + 1]);
 		}
 	}
 
@@ -124,9 +114,7 @@ public class StringUtilTest  {
 			String actualResult = StringUtil.substringBeforeLast(
 					(String) testData[i], (Character) testData[i + 1]);
 			String expectedResult = (String) testData[i + 2];
-			assertEquals(
-					(i / 3) + " : " + testData[i] + ", " + testData[i + 1],
-					expectedResult, actualResult);
+			assertEquals(expectedResult, actualResult, (i / 3) + " : " + testData[i] + ", " + testData[i + 1]);
 		}
 	}
 
@@ -138,9 +126,7 @@ public class StringUtilTest  {
 			String actualResult = StringUtil.substringAfter(
 					(String) testData[i], (Character) testData[i + 1]);
 			String expectedResult = (String) testData[i + 2];
-			assertEquals(
-					(i / 3) + " : " + testData[i] + ", " + testData[i + 1],
-					expectedResult, actualResult);
+			assertEquals(expectedResult, actualResult, (i / 3) + " : " + testData[i] + ", " + testData[i + 1]);
 		}
 	}
 
@@ -152,9 +138,7 @@ public class StringUtilTest  {
 			String actualResult = StringUtil.substringAfterLast(
 					(String) testData[i], (Character) testData[i + 1]);
 			String expectedResult = (String) testData[i + 2];
-			assertEquals(
-					(i / 3) + " : " + testData[i] + ", " + testData[i + 1],
-					expectedResult, actualResult);
+			assertEquals(expectedResult, actualResult, (i / 3) + " : " + testData[i] + ", " + testData[i + 1]);
 		}
 	}
 
@@ -176,11 +160,6 @@ public class StringUtilTest  {
 
 	@Test
 	public void testReplacementForCollapsePathDots() throws IOException {
-		// This used to test StringUtil.collapsePathDots(String path).
-		// I have left it to confirm that the Apache commons
-		// FilenameUtils.normalize
-		// is a suitable replacement, but works where for "/a/b/../../c", which
-		// the old method did not.
 		String[] testData = new String[] { //
 			"/foo/bar.html", "/foo/bar.html",
 			"/foo/../bar.html", "/bar.html", //
@@ -193,7 +172,7 @@ public class StringUtilTest  {
 		};
 		for (int i = 0; i < testData.length; i += 2) {
 			String actualResult = StringUtil.collapsePathDots(testData[i]);
-			assertEquals(testData[i], testData[i + 1], actualResult);
+			assertEquals(testData[i + 1], actualResult, testData[i]);
 		}
 	}
 

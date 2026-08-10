@@ -4,13 +4,16 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import nl.siegmann.epublib.util.StringUtil;
 
 /**
- * The spine sections are the sections of the book in the order in which the book should be read.
+ * The spine sections are the sections of the book in the order in which the
+ * book should be read.
  * 
- * This contrasts with the Table of Contents sections which is an index into the Book's sections.
+ * This contrasts with the Table of Contents sections which is an index into the
+ * Book's sections.
  *
  * @see nl.siegmann.epublib.domain.TableOfContents
  * 
@@ -29,7 +32,7 @@ public class Spine implements Serializable {
 	public Spine() {
 		this(new ArrayList<SpineReference>());
 	}
-	
+
 	/**
 	 * Creates a spine out of all the resources in the table of contents.
 	 * 
@@ -44,16 +47,18 @@ public class Spine implements Serializable {
 	}
 
 	public static List<SpineReference> createSpineReferences(Collection<Resource> resources) {
-		List<SpineReference> result = new ArrayList<SpineReference>(resources.size());
-		for (Resource resource: resources) {
-			result.add(new SpineReference(resource));
+		if (resources == null) {
+			return new ArrayList<>();
 		}
-		return result;
+		return resources.stream()
+				.map(SpineReference::new)
+				.toList();
 	}
-	
+
 	public List<SpineReference> getSpineReferences() {
 		return spineReferences;
 	}
+
 	public void setSpineReferences(List<SpineReference> spineReferences) {
 		this.spineReferences = spineReferences;
 	}
@@ -71,7 +76,7 @@ public class Spine implements Serializable {
 		}
 		return spineReferences.get(index).getResource();
 	}
-	
+
 	/**
 	 * Finds the first resource that has the given resourceId.
 	 * 
@@ -84,7 +89,7 @@ public class Spine implements Serializable {
 		if (StringUtil.isBlank(resourceId)) {
 			return -1;
 		}
-		
+
 		for (int i = 0; i < spineReferences.size(); i++) {
 			SpineReference spineReference = spineReferences.get(i);
 			if (resourceId.equals(spineReference.getResourceId())) {
@@ -93,7 +98,7 @@ public class Spine implements Serializable {
 		}
 		return -1;
 	}
-	
+
 	/**
 	 * Adds the given spineReference to the spine references and returns it.
 	 * 
@@ -127,8 +132,10 @@ public class Spine implements Serializable {
 	}
 
 	/**
-	 * As per the epub file format the spine officially maintains a reference to the Table of Contents.
-	 * The epubwriter will look for it here first, followed by some clever tricks to find it elsewhere if not found.
+	 * As per the epub file format the spine officially maintains a reference to the
+	 * Table of Contents.
+	 * The epubwriter will look for it here first, followed by some clever tricks to
+	 * find it elsewhere if not found.
 	 * Put it here to be sure of the expected behaviours.
 	 * 
 	 * @param tocResource
@@ -183,6 +190,7 @@ public class Spine implements Serializable {
 
 	/**
 	 * Whether the spine has any references
+	 * 
 	 * @return Whether the spine has any references
 	 */
 	public boolean isEmpty() {

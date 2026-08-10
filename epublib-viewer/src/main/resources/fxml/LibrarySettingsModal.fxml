@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.Region?>
+
+<StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="nl.siegmann.epublib.viewer.controller.LibrarySettingsModalController"
+           style="-fx-background-color: rgba(0, 0, 0, 0.7);"
+           visible="false">
+    
+    <!-- Modal Container -->
+    <VBox maxWidth="400" maxHeight="500" styleClass="modal-panel" spacing="20" style="-fx-background-color: #1a1a2e; -fx-background-radius: 12; -fx-padding: 25; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 20, 0, 0, 10);">
+        
+        <!-- Header -->
+        <HBox alignment="CENTER_LEFT">
+            <Label text="Global Settings" style="-fx-text-fill: #e8e0d5; -fx-font-size: 22px; -fx-font-weight: bold;"/>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button text="✕" onAction="#onClose" style="-fx-background-color: transparent; -fx-text-fill: #8a8a9e; -fx-font-size: 18px; -fx-cursor: hand;" />
+        </HBox>
+        
+        <Label text="These settings apply to all books opened in the reader." style="-fx-text-fill: #8a8a9e; -fx-wrap-text: true;" />
+
+        <VBox spacing="15">
+            <!-- Font Size -->
+            <VBox spacing="5">
+                <HBox><Label text="Font Size" styleClass="panel-text" /><Region HBox.hgrow="ALWAYS"/><Label fx:id="fontSizeValueLabel" text="18pt" styleClass="panel-text-muted" /></HBox>
+                <Slider fx:id="fontSizeSlider" styleClass="amber-slider" min="12" max="72" blockIncrement="1" majorTickUnit="1" snapToTicks="true"/>
+            </VBox>
+
+            <!-- Line Spacing -->
+            <VBox spacing="5">
+                <Label text="Line Spacing" styleClass="panel-text" />
+                <Slider fx:id="lineSpacingSlider" styleClass="amber-slider" min="0.5" max="3.0" blockIncrement="0.1" />
+            </VBox>
+
+            <!-- Paragraph Spacing -->
+            <VBox spacing="5">
+                <Label text="Paragraph Spacing" styleClass="panel-text" />
+                <Slider fx:id="paragraphSpacingSlider" styleClass="amber-slider" min="-50" max="200" />
+            </VBox>
+
+            <!-- Character Spacing -->
+            <VBox spacing="5">
+                <Label text="Character Spacing" styleClass="panel-text" />
+                <Slider fx:id="letterSpacingSlider" styleClass="amber-slider" min="-5" max="10" />
+            </VBox>
+        </VBox>
+        
+    </VBox>
+</StackPane>

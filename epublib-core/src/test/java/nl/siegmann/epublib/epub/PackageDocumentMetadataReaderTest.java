@@ -1,7 +1,7 @@
 package nl.siegmann.epublib.epub;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -9,8 +9,8 @@ import java.io.StringReader;
 import nl.siegmann.epublib.domain.Identifier;
 import nl.siegmann.epublib.domain.Metadata;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -18,44 +18,31 @@ import org.xml.sax.SAXException;
 public class PackageDocumentMetadataReaderTest {
 	
 	@Test	
-	public void test1() {
-		try {
-			Document document = EpubProcessorSupport.createDocumentBuilder().parse(PackageDocumentMetadataReader.class.getResourceAsStream("/opf/test2.opf"));
-			Metadata metadata = PackageDocumentMetadataReader.readMetadata(document);
-			assertEquals(1, metadata.getAuthors().size());
-		} catch (Exception e) {
-			e.printStackTrace();
-			assertTrue(false);
-		}
+	public void readMetadata_fromOpfFile_readsAuthors() throws Exception {
+		Document document = EpubProcessorSupport.createDocumentBuilder().parse(PackageDocumentMetadataReader.class.getResourceAsStream("/opf/test2.opf"));
+		Metadata metadata = PackageDocumentMetadataReader.readMetadata(document);
+		assertEquals(1, metadata.getAuthors().size());
 	}
 
 	@Test	
-    public void testReadsLanguage() {
+    public void testReadsLanguage() throws Exception {
         Metadata metadata = getMetadata("/opf/test_language.opf");
         assertEquals("fi", metadata.getLanguage());
     }
 
 	@Test	
-    public void testDefaultsToEnglish() {
+    public void testDefaultsToEnglish() throws Exception {
         Metadata metadata = getMetadata("/opf/test_default_language.opf");
         assertEquals("en", metadata.getLanguage());
     }
 
-    private Metadata getMetadata(String file) {
-        try {
-            Document document = EpubProcessorSupport.createDocumentBuilder().parse(PackageDocumentMetadataReader.class.getResourceAsStream(file));
-
-            return PackageDocumentMetadataReader.readMetadata(document);
-        } catch (Exception e) {
-            e.printStackTrace();
-            assertTrue(false);
-
-            return null;
-        }
+    private Metadata getMetadata(String file) throws Exception {
+        Document document = EpubProcessorSupport.createDocumentBuilder().parse(PackageDocumentMetadataReader.class.getResourceAsStream(file));
+        return PackageDocumentMetadataReader.readMetadata(document);
     }
     
 	@Test	
-    public void test2() throws SAXException, IOException {
+    public void readMetadata_fromOpfXmlString_readsTitleIdentifiersAndMeta() throws SAXException, IOException {
     	// given
     	String input = "<package version=\"2.0\" xmlns=\"http://www.idpf.org/2007/opf\" unique-identifier=\"BookId\">"
 			+ "<metadata xmlns=\"http://www.idpf.org/2007/opf\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:opf=\"http://www.idpf.org/2007/opf\">"
@@ -84,16 +71,16 @@ public class PackageDocumentMetadataReaderTest {
     	Metadata metadata = PackageDocumentMetadataReader.readMetadata(metadataDocument);
     	
     	// then
-    	Assert.assertEquals("Three Men in a Boat", metadata.getFirstTitle());
+    	Assertions.assertEquals("Three Men in a Boat", metadata.getFirstTitle());
 
     	// test identifier
-    	Assert.assertNotNull(metadata.getIdentifiers());
-    	Assert.assertEquals(1, metadata.getIdentifiers().size());
+    	Assertions.assertNotNull(metadata.getIdentifiers());
+    	Assertions.assertEquals(1, metadata.getIdentifiers().size());
     	Identifier identifier = metadata.getIdentifiers().get(0);
-    	Assert.assertEquals("URI", identifier.getScheme());
-    	Assert.assertEquals("zelda@mobileread.com:2010040720", identifier.getValue());
+    	Assertions.assertEquals("URI", identifier.getScheme());
+    	Assertions.assertEquals("zelda@mobileread.com:2010040720", identifier.getValue());
     	
-    	Assert.assertEquals("8", metadata.getMetaAttribute("calibre:rating"));
-    	Assert.assertEquals("cover_pic", metadata.getMetaAttribute("cover"));
+    	Assertions.assertEquals("8", metadata.getMetaAttribute("calibre:rating"));
+    	Assertions.assertEquals("cover_pic", metadata.getMetaAttribute("cover"));
     }
 }

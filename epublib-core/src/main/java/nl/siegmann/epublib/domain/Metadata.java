@@ -2,6 +2,7 @@ package nl.siegmann.epublib.domain;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -130,12 +131,10 @@ public class Metadata implements Serializable {
 		if (titles == null || titles.isEmpty()) {
 			return "";
 		}
-		for (String title: titles) {
-			if (StringUtil.isNotBlank(title)) {
-				return title;
-			}
-		}
-		return "";
+		return titles.stream()
+				.filter(StringUtil::isNotBlank)
+				.findFirst()
+				.orElse("");
 	}
 	
 	
@@ -215,4 +214,64 @@ public class Metadata implements Serializable {
 	public void setMetaAttributes(Map<String, String> metaAttributes) {
 		this.metaAttributes = metaAttributes;
 	}
+
+	public RenditionLayout getRenditionLayout() {
+		return otherProperties.entrySet().stream()
+				.filter(entry -> "rendition:layout".equalsIgnoreCase(entry.getKey().getLocalPart()))
+				.map(entry -> RenditionLayout.fromValue(entry.getValue()))
+				.findFirst()
+				.orElse(null);
+	}
+
+	public void setRenditionLayout(RenditionLayout layout) {
+		if (layout == null) {
+			otherProperties.entrySet().removeIf(e -> "rendition:layout".equalsIgnoreCase(e.getKey().getLocalPart()));
+		} else {
+			otherProperties.put(new javax.xml.namespace.QName("rendition:layout"), layout.getValue());
+		}
+	}
+
+	/**
+	 * Validates the metadata against EPUB specification requirements.
+	 *
+	 * <p>Checks for: at least one non-blank title, at least one identifier with a non-blank value,
+	 * a non-blank language code, and at least one author.</p>
+	 *
+	 * @return an unmodifiable list of {@link ValidationIssue} objects; empty if metadata is valid
+	 * @since 5.0
+	 */
+	public List<ValidationIssue> validate() {
+		List<ValidationIssue> issues = new ArrayList<>();
+
+		// Title check
+		boolean hasTitle = titles != null && titles.stream().anyMatch(StringUtil::isNotBlank);
+		if (!hasTitle) {
+			issues.add(new ValidationIssue(ValidationIssue.Severity.ERROR, "title",
+					"At least one non-blank title is required (dc:title)"));
+		}
+
+		// Identifier check
+		boolean hasIdentifier = identifiers != null && identifiers.stream()
+				.anyMatch(id -> id != null && StringUtil.isNotBlank(id.getValue()));
+		if (!hasIdentifier) {
+			issues.add(new ValidationIssue(ValidationIssue.Severity.ERROR, "identifier",
+					"At least one non-blank identifier is required (dc:identifier)"));
+		}
+
+		// Language check
+		if (StringUtil.isBlank(language)) {
+			issues.add(new ValidationIssue(ValidationIssue.Severity.ERROR, "language",
+					"A language code is required (dc:language)"));
+		}
+
+		// Author check (warning only — not strictly required by spec but strongly recommended)
+		boolean hasAuthor = authors != null && !authors.isEmpty();
+		if (!hasAuthor) {
+			issues.add(new ValidationIssue(ValidationIssue.Severity.WARNING, "author",
+					"No author specified (dc:creator). At least one author is strongly recommended"));
+		}
+
+		return Collections.unmodifiableList(issues);
+	}
 }
+

@@ -1,0 +1,14 @@
+/* Base injection for sepia theme is handled dynamically by ReaderController */
+::selection {
+    background: rgba(139, 92, 42, 0.3);
+}
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 42, 0.4);
+    border-radius: 4px;
+}

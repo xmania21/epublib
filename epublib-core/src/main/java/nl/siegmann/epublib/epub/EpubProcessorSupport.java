@@ -46,7 +46,7 @@ public class EpubProcessorSupport {
 				throws SAXException, IOException {
 			String resourcePath;
 			if (systemId.startsWith("http:")) {
-				URL url = new URL(systemId);
+				URL url = java.net.URI.create(systemId).toURL();
 				resourcePath = "dtd/" + url.getHost() + url.getPath();
 				previousLocation = resourcePath.substring(0, resourcePath.lastIndexOf('/'));
 			} else {

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.StackPane?>
+
+<StackPane xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="nl.siegmann.epublib.viewer.controller.LibraryController"
+           style="-fx-background-color: #0a0a0a;">
+
+    <VBox styleClass="library-root">
+        <!-- Sleek Dark Toolbar -->
+        <HBox spacing="10" alignment="CENTER_LEFT" styleClass="library-toolbar" style="-fx-padding: 15 25; -fx-background-color: #1a1a2e; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 10, 0, 0, 5);">
+            <Label text="My Library" minWidth="0" textOverrun="ELLIPSIS" styleClass="library-title" style="-fx-text-fill: #e8e0d5; -fx-font-size: 20px; -fx-font-weight: bold; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 5, 0, 0, 1);"/>
+            <HBox HBox.hgrow="ALWAYS" />
+            
+            <!-- Mobile-Friendly Icon Buttons -->
+            <Button text="➕" onAction="#onImportEpub" minWidth="-Infinity" styleClass="icon-button" style="-fx-background-color: rgba(255, 255, 255, 0.1); -fx-text-fill: #e8e0d5; -fx-font-weight: bold; -fx-font-size: 16px; -fx-padding: 8 15; -fx-background-radius: 20; -fx-cursor: hand;" />
+            <Button text="📁" onAction="#onImportFolder" minWidth="-Infinity" styleClass="icon-button" style="-fx-background-color: rgba(255, 255, 255, 0.1); -fx-text-fill: #e8e0d5; -fx-font-weight: bold; -fx-font-size: 16px; -fx-padding: 8 15; -fx-background-radius: 20; -fx-cursor: hand;" />
+            <Button text="⚙" onAction="#onSettingsOpen" minWidth="-Infinity" styleClass="icon-button" style="-fx-background-color: transparent; -fx-text-fill: #e8a45a; -fx-font-size: 20px; -fx-padding: 8 15; -fx-background-radius: 20; -fx-cursor: hand;" />
+        </HBox>
+
+        <ScrollPane VBox.vgrow="ALWAYS" fitToWidth="true" style="-fx-background-color: transparent;" styleClass="library-scroll">
+            <FlowPane fx:id="bookGrid" hgap="30" vgap="40" alignment="TOP_CENTER" style="-fx-padding: 40px;">
+                <!-- Books will be populated here -->
+            </FlowPane>
+        </ScrollPane>
+    </VBox>
+
+    <!-- Global Settings Modal Overlay -->
+    <fx:include source="LibrarySettingsModal.fxml" fx:id="settingsModal"/>
+
+</StackPane>

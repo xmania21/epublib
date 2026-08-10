@@ -1,6 +1,6 @@
 package nl.siegmann.epublib.epub;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -41,7 +41,7 @@ public class PackageDocumentReaderTest {
 		Resource actualResult = PackageDocumentReader.findTableOfContentsResource("foo", resources);
 		
 		// then
-		Assert.assertEquals(resource, actualResult);
+		Assertions.assertEquals(resource, actualResult);
 		Mockito.verify(resources).getByIdOrHref(tocResourceId);
 		Mockito.verifyNoMoreInteractions(resources);
 	}
@@ -59,7 +59,7 @@ public class PackageDocumentReaderTest {
 		Resource actualResult = PackageDocumentReader.findTableOfContentsResource("foo", resources);
 		
 		// then
-		Assert.assertEquals(resource, actualResult);
+		Assertions.assertEquals(resource, actualResult);
 		Mockito.verify(resources).getByIdOrHref(tocResourceId);
 		Mockito.verify(resources).findFirstResourceByMediaType(MediatypeService.NCX);
 		Mockito.verifyNoMoreInteractions(resources);
@@ -79,7 +79,7 @@ public class PackageDocumentReaderTest {
 		Resource actualResult = PackageDocumentReader.findTableOfContentsResource("foo", resources);
 		
 		// then
-		Assert.assertEquals(resource, actualResult);
+		Assertions.assertEquals(resource, actualResult);
 		Mockito.verify(resources).getByIdOrHref(tocResourceId);
 		Mockito.verify(resources).getByIdOrHref("toc");
 		Mockito.verify(resources).getByIdOrHref("TOC");
@@ -94,7 +94,6 @@ public class PackageDocumentReaderTest {
 		// given
 		String tocResourceId = "foo";
 		Resources resources = mock(Resources.class);
-		Resource resource = mock(Resource.class);
 		when(resources.getByIdOrHref(Mockito.anyString())).thenReturn(null);
 		when(resources.findFirstResourceByMediaType(MediatypeService.NCX)).thenReturn(null);
 
@@ -102,7 +101,7 @@ public class PackageDocumentReaderTest {
 		Resource actualResult = PackageDocumentReader.findTableOfContentsResource("foo", resources);
 		
 		// then
-		Assert.assertNull(actualResult);
+		Assertions.assertNull(actualResult);
 		Mockito.verify(resources).getByIdOrHref(tocResourceId);
 		Mockito.verify(resources).getByIdOrHref("toc");
 		Mockito.verify(resources).getByIdOrHref("TOC");
@@ -146,6 +145,6 @@ public class PackageDocumentReaderTest {
 		PackageDocumentReader.fixHrefs(packageHref, resources);
 		
 		// then
-		Assert.assertTrue(true);
+		Assertions.assertTrue(true);
 	}
 }

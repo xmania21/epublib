@@ -71,7 +71,9 @@ public class PackageDocumentWriter extends PackageDocumentBase {
 	 */
 	private static void writeSpine(Book book, EpubWriter epubWriter, XmlSerializer serializer) throws IllegalArgumentException, IllegalStateException, IOException {
 		serializer.startTag(NAMESPACE_OPF, OPFTags.spine);
-		serializer.attribute(EpubWriter.EMPTY_NAMESPACE_PREFIX, OPFAttributes.toc, book.getSpine().getTocResource().getId());
+		if (book.getSpine().getTocResource() != null) {
+			serializer.attribute(EpubWriter.EMPTY_NAMESPACE_PREFIX, OPFAttributes.toc, book.getSpine().getTocResource().getId());
+		}
 
 		if(book.getCoverPage() != null // there is a cover page
 			&&	book.getSpine().findFirstResourceById(book.getCoverPage().getId()) < 0) { // cover page is not already in the spine
@@ -147,6 +149,22 @@ public class PackageDocumentWriter extends PackageDocumentBase {
 		serializer.attribute(EpubWriter.EMPTY_NAMESPACE_PREFIX, OPFAttributes.id, resource.getId());
 		serializer.attribute(EpubWriter.EMPTY_NAMESPACE_PREFIX, OPFAttributes.href, resource.getHref());
 		serializer.attribute(EpubWriter.EMPTY_NAMESPACE_PREFIX, OPFAttributes.media_type, resource.getMediaType().getName());
+
+		// EPUB 3.3 manifest item properties
+		StringBuilder properties = new StringBuilder();
+		if ("nav".equalsIgnoreCase(resource.getId()) || "nav.xhtml".equalsIgnoreCase(resource.getHref())) {
+			properties.append("nav");
+		}
+		if (book.getCoverImage() != null && resource.getId().equals(book.getCoverImage().getId())) {
+			if (properties.length() > 0) {
+				properties.append(" ");
+			}
+			properties.append("cover-image");
+		}
+		if (properties.length() > 0) {
+			serializer.attribute(EpubWriter.EMPTY_NAMESPACE_PREFIX, "properties", properties.toString());
+		}
+
 		serializer.endTag(NAMESPACE_OPF, OPFTags.item);
 	}
 

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.canvas.Canvas?>
+
+<VBox fx:id="settingsRoot"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="nl.siegmann.epublib.viewer.controller.TapZoneSettingsController"
+      styleClass="settings-panel"
+      spacing="15">
+
+    <fx:define>
+        <ToggleGroup fx:id="layoutGroup" />
+    </fx:define>
+
+    <Label text="Tap Zone Layout" styleClass="settings-title" />
+    <Label text="Configure how the screen responds to taps." styleClass="settings-subtitle" />
+
+    <HBox spacing="10" alignment="CENTER_LEFT" styleClass="layout-card">
+        <Canvas fx:id="cvsClassic" width="80" height="120" />
+        <RadioButton fx:id="rbClassic" toggleGroup="$layoutGroup" text="Classic (L / C / R)" styleClass="layout-radio" />
+    </HBox>
+
+    <HBox spacing="10" alignment="CENTER_LEFT" styleClass="layout-card">
+        <Canvas fx:id="cvsSplit" width="80" height="120" />
+        <RadioButton fx:id="rbSplit" toggleGroup="$layoutGroup" text="Split (L / R)" styleClass="layout-radio" />
+    </HBox>
+
+    <HBox spacing="10" alignment="CENTER_LEFT" styleClass="layout-card">
+        <Canvas fx:id="cvsKindle" width="80" height="120" />
+        <RadioButton fx:id="rbKindle" toggleGroup="$layoutGroup" text="Kindle-style" styleClass="layout-radio" />
+    </HBox>
+
+    <HBox spacing="10" alignment="CENTER_LEFT" styleClass="layout-card">
+        <Canvas fx:id="cvsTopBottom" width="80" height="120" />
+        <RadioButton fx:id="rbTopBottom" toggleGroup="$layoutGroup" text="Top / Bottom" styleClass="layout-radio" />
+    </HBox>
+
+</VBox>

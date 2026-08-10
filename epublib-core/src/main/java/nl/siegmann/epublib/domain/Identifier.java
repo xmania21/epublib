@@ -2,6 +2,7 @@ package nl.siegmann.epublib.domain;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import nl.siegmann.epublib.util.StringUtil;
@@ -46,6 +47,34 @@ public class Identifier implements Serializable {
 	}
 
 	/**
+	 * Creates an Identifier with the given scheme and value.
+	 *
+	 * @param scheme the identifier scheme (e.g. {@link Scheme#ISBN}, {@link Scheme#UUID})
+	 * @param value  the identifier value
+	 * @return a new Identifier instance
+	 * @since 5.0
+	 */
+	public static Identifier of(String scheme, String value) {
+		return new Identifier(scheme, value);
+	}
+
+	/**
+	 * Creates an Identifier with the given scheme, value, and book-id flag.
+	 *
+	 * @param scheme  the identifier scheme
+	 * @param value   the identifier value
+	 * @param bookId  whether this identifier is the primary book identifier
+	 * @return a new Identifier instance
+	 * @since 5.0
+	 */
+	public static Identifier of(String scheme, String value, boolean bookId) {
+		Identifier id = new Identifier(scheme, value);
+		id.setBookId(bookId);
+		return id;
+	}
+
+
+	/**
 	 * The first identifier for which the bookId is true is made the bookId identifier.
 	 * If no identifier has bookId == true then the first bookId identifier is written as the primary.
 	 * 
@@ -53,72 +82,60 @@ public class Identifier implements Serializable {
 	 * @return The first identifier for which the bookId is true is made the bookId identifier.
 	 */
 	public static Identifier getBookIdIdentifier(List<Identifier> identifiers) {
-		if(identifiers == null || identifiers.isEmpty()) {
+		if (identifiers == null || identifiers.isEmpty()) {
 			return null;
 		}
-		
-		Identifier result = null;
-		for(Identifier identifier: identifiers) {
-			if(identifier.isBookId()) {
-				result = identifier;
-				break;
-			}
-		}
-		
-		if(result == null) {
-			result = identifiers.get(0);
-		}
-		
-		return result;
+		return identifiers.stream()
+				.filter(Identifier::isBookId)
+				.findFirst()
+				.orElseGet(() -> identifiers.get(0));
 	}
 	
 	public String getScheme() {
 		return scheme;
 	}
+
 	public void setScheme(String scheme) {
 		this.scheme = scheme;
 	}
+
 	public String getValue() {
 		return value;
 	}
+
 	public void setValue(String value) {
 		this.value = value;
 	}
-
 
 	public void setBookId(boolean bookId) {
 		this.bookId = bookId;
 	}
 
-
-	/**
-	 * This bookId property allows the book creator to add multiple ids and tell the epubwriter which one to write out as the bookId.
-	 *  
-	 * The Dublin Core metadata spec allows multiple identifiers for a Book.
-	 * The epub spec requires exactly one identifier to be marked as the book id.
-	 * 
-	 * @return whether this is the unique book id.
-	 */
 	public boolean isBookId() {
 		return bookId;
 	}
 
+	@Override
 	public int hashCode() {
-		return StringUtil.defaultIfNull(scheme).hashCode() ^ StringUtil.defaultIfNull(value).hashCode();
+		return Objects.hash(scheme, value);
 	}
 	
+	@Override
 	public boolean equals(Object otherIdentifier) {
-		if(! (otherIdentifier instanceof Identifier)) {
+		if (this == otherIdentifier) {
+			return true;
+		}
+		if (!(otherIdentifier instanceof Identifier other)) {
 			return false;
 		}
-		return StringUtil.equals(scheme, ((Identifier) otherIdentifier).scheme)
-		&& StringUtil.equals(value, ((Identifier) otherIdentifier).value);
+		return Objects.equals(scheme, other.scheme) && Objects.equals(value, other.value);
 	}
 	
+	@Override
 	public String toString() {
 		if (StringUtil.isBlank(scheme)) {
-			return "" + value;
+			return String.valueOf(value);
 		}
-		return "" + scheme + ":" + value;
+		return scheme + ":" + value;
 	}
 }

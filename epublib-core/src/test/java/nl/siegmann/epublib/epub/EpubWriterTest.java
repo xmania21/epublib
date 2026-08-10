@@ -1,10 +1,5 @@
 package nl.siegmann.epublib.epub;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -20,8 +15,8 @@ import nl.siegmann.epublib.domain.Resource;
 import nl.siegmann.epublib.domain.TOCReference;
 import nl.siegmann.epublib.util.CollectionUtil;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class EpubWriterTest {
 
@@ -36,22 +31,22 @@ public class EpubWriterTest {
 			fileOutputStream.write(bookData);
 			fileOutputStream.flush();
 			fileOutputStream.close();
-		Assert.assertNotNull(bookData);
-		Assert.assertTrue(bookData.length > 0);
+		Assertions.assertNotNull(bookData);
+		Assertions.assertTrue(bookData.length > 0);
 		
 		// read book from byte[]
 		Book readBook = new EpubReader().readEpub(new ByteArrayInputStream(bookData));
 		
 		// assert book values are correct
-		Assert.assertEquals(book.getMetadata().getTitles(), readBook.getMetadata().getTitles());
-		Assert.assertEquals(Identifier.Scheme.ISBN, CollectionUtil.first(readBook.getMetadata().getIdentifiers()).getScheme());
-		Assert.assertEquals(CollectionUtil.first(book.getMetadata().getIdentifiers()).getValue(), CollectionUtil.first(readBook.getMetadata().getIdentifiers()).getValue());
-		Assert.assertEquals(CollectionUtil.first(book.getMetadata().getAuthors()), CollectionUtil.first(readBook.getMetadata().getAuthors()));
-		Assert.assertEquals(1, readBook.getGuide().getGuideReferencesByType(GuideReference.COVER).size());
-		Assert.assertEquals(5, readBook.getSpine().size());
-		Assert.assertNotNull(book.getCoverPage());
-		Assert.assertNotNull(book.getCoverImage());
-		Assert.assertEquals(4, readBook.getTableOfContents().size());
+		Assertions.assertEquals(book.getMetadata().getTitles(), readBook.getMetadata().getTitles());
+		Assertions.assertEquals(Identifier.Scheme.ISBN, CollectionUtil.first(readBook.getMetadata().getIdentifiers()).getScheme());
+		Assertions.assertEquals(CollectionUtil.first(book.getMetadata().getIdentifiers()).getValue(), CollectionUtil.first(readBook.getMetadata().getIdentifiers()).getValue());
+		Assertions.assertEquals(CollectionUtil.first(book.getMetadata().getAuthors()), CollectionUtil.first(readBook.getMetadata().getAuthors()));
+		Assertions.assertEquals(1, readBook.getGuide().getGuideReferencesByType(GuideReference.COVER).size());
+		Assertions.assertEquals(5, readBook.getSpine().size());
+		Assertions.assertNotNull(book.getCoverPage());
+		Assertions.assertNotNull(book.getCoverImage());
+		Assertions.assertEquals(4, readBook.getTableOfContents().size());
 			
 	}
 	
@@ -133,24 +128,4 @@ public class EpubWriterTest {
 //	            book.getMetadata().addContributor(contributor);
 //	        }
 //	       
-//	       
-//	        book.setCoverImage(coverImg);
-//	        for(BookChapterDTO chapter : dto.getChapters()){
-//	            Resource aux = new Resource(HTMLGenerator.generateChapterHtmlStream(dto,chapter), "chapter"+chapter.getNumber()+".html");
-//	            book.addSection(chapter.getTitle(), aux );
-//	        }
-//	       
-//	        EpubWriter writer = new EpubWriter();
-//	        FileOutputStream output = new FileOutputStream(ResourceBundle.getBundle("info.pxdev.pfi.webclient.resources.Config").getString("HTML_CHAPTERS")+dto.getId_book()+"\\test.epub");
-//	       
-//	        try {
-//	            writer.write(book, output);
-//	        } catch (XMLStreamException e) {
-//	            // TODO Auto-generated catch block
-//	            e.printStackTrace();
-//	        } catch (FactoryConfigurationError e) {
-//	            // TODO Auto-generated catch block
-//	            e.printStackTrace();
-//	        }
-//	    }
 }

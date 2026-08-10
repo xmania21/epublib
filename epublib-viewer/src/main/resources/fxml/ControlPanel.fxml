@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+
+<VBox fx:id="panelRoot"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="nl.siegmann.epublib.viewer.controller.ControlPanelController"
+      styleClass="control-panel">
+
+    <!-- Top Title Bar -->
+    <HBox alignment="CENTER_LEFT" spacing="10" styleClass="panel-row" style="-fx-padding: 0 0 15 0; -fx-border-width: 0 0 1 0; -fx-border-color: #333333;">
+        <Button text="◀" onAction="#onBackToLibrary" minWidth="-Infinity" styleClass="icon-button" style="-fx-text-fill: #e8a45a; -fx-font-size: 18px; -fx-background-color: transparent; -fx-cursor: hand;" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Label fx:id="headerTitleLabel" text="Book Title" minWidth="0" textOverrun="ELLIPSIS" styleClass="panel-text-bold" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button text="⚙" onAction="#onSettingsOpen" minWidth="-Infinity" styleClass="icon-button" style="-fx-text-fill: #e8a45a; -fx-font-size: 18px; -fx-background-color: transparent; -fx-cursor: hand;" />
+    </HBox>
+
+    <!-- Middle Section: Tabs (Typography, Theme) -->
+    <TabPane fx:id="controlTabPane" tabClosingPolicy="UNAVAILABLE" styleClass="control-tabs">
+        
+        <!-- Tab 1: Font -->
+        <Tab text="Aa Font">
+            <VBox spacing="10" styleClass="panel-row">
+                <!-- Font Size -->
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <Label text="Size" styleClass="panel-text" prefWidth="60" />
+                    <Slider fx:id="fontSizeSlider" HBox.hgrow="ALWAYS" styleClass="amber-slider" />
+                    <Label fx:id="fontSizeValueLabel" text="18pt" styleClass="panel-text-muted" prefWidth="40" alignment="CENTER_RIGHT" />
+                </HBox>
+                
+                <!-- Styles and Alignment -->
+                <HBox spacing="10" alignment="CENTER">
+                    <ToggleButton fx:id="boldToggle" text="B" styleClass="panel-toggle-button" style="-fx-font-weight: bold;" />
+                    <ToggleButton fx:id="italicToggle" text="I" styleClass="panel-toggle-button" style="-fx-font-style: italic;" />
+                    <ToggleButton fx:id="underlineToggle" text="U" styleClass="panel-toggle-button" style="-fx-underline: true;" />
+                    
+                    <Region prefWidth="20" />
+                    
+                    <fx:define>
+                        <ToggleGroup fx:id="alignGroup" />
+                    </fx:define>
+                    <ToggleButton fx:id="alignLeftToggle" text="Left" toggleGroup="$alignGroup" styleClass="panel-toggle-button" />
+                    <ToggleButton fx:id="alignJustifyToggle" text="Justify" toggleGroup="$alignGroup" styleClass="panel-toggle-button" />
+                </HBox>
+            </VBox>
+        </Tab>
+        
+        <!-- Tab 2: Margins -->
+        <Tab text="↔ Margins">
+            <VBox spacing="10" styleClass="panel-row">
+                <HBox spacing="10" alignment="CENTER_LEFT"><Label text="Top" styleClass="panel-text" prefWidth="60"/><Slider fx:id="marginTopSlider" HBox.hgrow="ALWAYS" styleClass="amber-slider" max="150"/></HBox>
+                <HBox spacing="10" alignment="CENTER_LEFT"><Label text="Bottom" styleClass="panel-text" prefWidth="60"/><Slider fx:id="marginBottomSlider" HBox.hgrow="ALWAYS" styleClass="amber-slider" max="150"/></HBox>
+                <HBox spacing="10" alignment="CENTER_LEFT"><Label text="Left" styleClass="panel-text" prefWidth="60"/><Slider fx:id="marginLeftSlider" HBox.hgrow="ALWAYS" styleClass="amber-slider" max="150"/></HBox>
+                <HBox spacing="10" alignment="CENTER_LEFT"><Label text="Right" styleClass="panel-text" prefWidth="60"/><Slider fx:id="marginRightSlider" HBox.hgrow="ALWAYS" styleClass="amber-slider" max="150"/></HBox>
+            </VBox>
+        </Tab>
+
+        <!-- Tab 3: Spacing -->
+        <Tab text="↕ Spacing">
+            <VBox spacing="10" styleClass="panel-row">
+                <HBox spacing="10" alignment="CENTER_LEFT"><Label text="Line" styleClass="panel-text" prefWidth="60"/><Slider fx:id="lineSpacingSlider" HBox.hgrow="ALWAYS" styleClass="amber-slider" min="0.5" max="3.0" value="1.75" blockIncrement="0.1"/></HBox>
+                <HBox spacing="10" alignment="CENTER_LEFT"><Label text="Para" styleClass="panel-text" prefWidth="60"/><Slider fx:id="paragraphSpacingSlider" HBox.hgrow="ALWAYS" styleClass="amber-slider" min="-50" max="200"/></HBox>
+                <HBox spacing="10" alignment="CENTER_LEFT"><Label text="Char" styleClass="panel-text" prefWidth="60"/><Slider fx:id="letterSpacingSlider" HBox.hgrow="ALWAYS" styleClass="amber-slider" min="-5" max="10"/></HBox>
+            </VBox>
+        </Tab>
+        
+        <!-- Tab 2: Theme -->
+        <Tab text="🎨 Theme">
+            <VBox spacing="15" alignment="CENTER" styleClass="panel-row">
+                <!-- Theme Swatches Row 1 -->
+                <HBox spacing="10" alignment="CENTER">
+                    <Button fx:id="themeLightBtn" text="Light" style="-fx-background-color: #ffffff; -fx-text-fill: #1a1a1a; -fx-border-color: #cccccc; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8 20; -fx-cursor: hand; -fx-font-weight: bold;" />
+                    <Button fx:id="themeSepiaBtn" text="Sepia" style="-fx-background-color: #f5e6c8; -fx-text-fill: #3b2a1a; -fx-border-color: #d4c4a8; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8 20; -fx-cursor: hand; -fx-font-weight: bold;" />
+                    <Button fx:id="themeSolarizedBtn" text="Solarized" style="-fx-background-color: #fdf6e3; -fx-text-fill: #657b83; -fx-border-color: #eee8d5; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8 20; -fx-cursor: hand; -fx-font-weight: bold;" />
+                </HBox>
+                <!-- Theme Swatches Row 2 -->
+                <HBox spacing="10" alignment="CENTER">
+                    <Button fx:id="themeDarkBtn" text="Dark" style="-fx-background-color: #1a1a2e; -fx-text-fill: #e8e0d5; -fx-border-color: #333333; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8 20; -fx-cursor: hand; -fx-font-weight: bold;" />
+                    <Button fx:id="themeNightBtn" text="Night" style="-fx-background-color: #0a0a0a; -fx-text-fill: #e8e0d5; -fx-border-color: #222222; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8 20; -fx-cursor: hand; -fx-font-weight: bold;" />
+                    <Button fx:id="themeOledBtn" text="OLED" style="-fx-background-color: #000000; -fx-text-fill: #ff3366; -fx-border-color: #ff3366; -fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8 20; -fx-cursor: hand; -fx-font-weight: bold;" />
+                </HBox>
+            </VBox>
+        </Tab>
+    </TabPane>
+
+    <!-- Persistent Bottom Bar -->
+    <VBox spacing="5" styleClass="panel-row">
+        <!-- Progress Row -->
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <Label fx:id="chapterLabel" text="≡ Chapter Title" onMouseClicked="#onTocOpen" styleClass="panel-text-bold" style="-fx-cursor: hand;" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="bookmarkBtn" text="☆" onAction="#onBookmarkToggle" styleClass="icon-button" />
+            <Button text="🔍" onAction="#onSearchOpen" styleClass="icon-button" />
+            <Label fx:id="pageCounterLabel" text="1 / 100" styleClass="panel-text-muted" />
+        </HBox>
+        <ProgressBar fx:id="chapterProgress" progress="0.0" maxWidth="Infinity" styleClass="amber-progress" />
+        
+        <!-- Chapter Nav Row -->
+        <HBox alignment="CENTER" spacing="15" styleClass="panel-row">
+            <Label fx:id="currentChapterLabel" text="1" styleClass="panel-text-muted" minWidth="-Infinity"/>
+            <Slider fx:id="chapterScrubber" HBox.hgrow="ALWAYS" styleClass="amber-slider" />
+            <Label fx:id="totalChaptersLabel" text="10" styleClass="panel-text-muted" minWidth="-Infinity"/>
+        </HBox>
+    </VBox>
+
+</VBox>

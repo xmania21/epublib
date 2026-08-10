@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import javax.xml.stream.FactoryConfigurationError;
-
 import nl.siegmann.epublib.Constants;
 import nl.siegmann.epublib.domain.Author;
 import nl.siegmann.epublib.domain.Book;
@@ -70,21 +68,19 @@ public class NCXDocument {
 	}
 
 	private interface NCXAttributeValues {
-
 		String chapter = "chapter";
 		String version = "2005-1";
-		
 	}
 	
 	public static Resource read(Book book, EpubReader epubReader) {
 		Resource ncxResource = null;
-		if(book.getSpine().getTocResource() == null) {
+		if (book.getSpine().getTocResource() == null) {
 			log.error("Book does not contain a table of contents file");
 			return ncxResource;
 		}
 		try {
 			ncxResource = book.getSpine().getTocResource();
-			if(ncxResource == null) {
+			if (ncxResource == null) {
 				return ncxResource;
 			}
 			Document ncxDocument = ResourceUtil.getAsDocument(ncxResource);
@@ -98,16 +94,16 @@ public class NCXDocument {
 	}
 	
 	private static List<TOCReference> readTOCReferences(NodeList navpoints, Book book) {
-		if(navpoints == null) {
-			return new ArrayList<TOCReference>();
+		if (navpoints == null) {
+			return new ArrayList<>();
 		}
-		List<TOCReference> result = new ArrayList<TOCReference>(navpoints.getLength());
-		for(int i = 0; i < navpoints.getLength(); i++) {
+		List<TOCReference> result = new ArrayList<>(navpoints.getLength());
+		for (int i = 0; i < navpoints.getLength(); i++) {
 			Node node = navpoints.item(i);
 			if (node.getNodeType() != Document.ELEMENT_NODE) {
 				continue;
 			}
-			if (! (node.getLocalName().equals(NCXTags.navPoint))) {
+			if (!node.getLocalName().equals(NCXTags.navPoint)) {
 				continue;
 			}
 			TOCReference tocReference = readTOCReference((Element) node, book);
@@ -129,7 +125,7 @@ public class NCXDocument {
 		String fragmentId = StringUtil.substringAfter(reference, Constants.FRAGMENT_SEPARATOR_CHAR);
 		Resource resource = book.getResources().getByHref(href);
 		if (resource == null) {
-			log.error("Resource with href " + href + " in NCX document not found");
+			log.error("Resource with href '{}' in NCX document not found", href);
 		}
 		TOCReference result = new TOCReference(label, resource, fragmentId);
 		List<TOCReference> childTOCReferences = readTOCReferences(navpointElement.getChildNodes(), book);
@@ -153,26 +149,13 @@ public class NCXDocument {
 		return DOMUtil.getTextChildrenContent(DOMUtil.getFirstElementByTagNameNS(navLabel, NAMESPACE_NCX, NCXTags.text));
 	}
 
-	
 	public static void write(EpubWriter epubWriter, Book book, ZipOutputStream resultStream) throws IOException {
 		resultStream.putNextEntry(new ZipEntry(book.getSpine().getTocResource().getHref()));
 		XmlSerializer out = EpubProcessorSupport.createXmlSerializer(resultStream);
 		write(out, book);
 		out.flush();
 	}
-	
 
-	/**
-	 * Generates a resource containing an xml document containing the table of contents of the book in ncx format.
-	 * 
-	 * @param xmlSerializer the serializer used
-	 * @param book the book to serialize
-	 * 
-	 * @throws FactoryConfigurationError
-	 * @throws IOException 
-	 * @throws IllegalStateException 
-	 * @throws IllegalArgumentException 
-	 */
 	public static void write(XmlSerializer xmlSerializer, Book book) throws IllegalArgumentException, IllegalStateException, IOException {
 		write(xmlSerializer, book.getMetadata().getIdentifiers(), book.getTitle(), book.getMetadata().getAuthors(), book.getTableOfContents());
 	}
@@ -180,24 +163,22 @@ public class NCXDocument {
 	public static Resource createNCXResource(Book book) throws IllegalArgumentException, IllegalStateException, IOException {
 		return createNCXResource(book.getMetadata().getIdentifiers(), book.getTitle(), book.getMetadata().getAuthors(), book.getTableOfContents());
 	}
+	
 	public static Resource createNCXResource(List<Identifier> identifiers, String title, List<Author> authors, TableOfContents tableOfContents) throws IllegalArgumentException, IllegalStateException, IOException {
-		ByteArrayOutputStream data = new ByteArrayOutputStream();
+		var data = new ByteArrayOutputStream();
 		XmlSerializer out = EpubProcessorSupport.createXmlSerializer(data);
 		write(out, identifiers, title, authors, tableOfContents);
-		Resource resource = new Resource(NCX_ITEM_ID, data.toByteArray(), DEFAULT_NCX_HREF, MediatypeService.NCX);
-		return resource;
+		return new Resource(NCX_ITEM_ID, data.toByteArray(), DEFAULT_NCX_HREF, MediatypeService.NCX);
 	}	
 	
 	public static void write(XmlSerializer serializer, List<Identifier> identifiers, String title, List<Author> authors, TableOfContents tableOfContents) throws IllegalArgumentException, IllegalStateException, IOException {
 		serializer.startDocument(Constants.CHARACTER_ENCODING, false);
 		serializer.setPrefix(EpubWriter.EMPTY_NAMESPACE_PREFIX, NAMESPACE_NCX);
 		serializer.startTag(NAMESPACE_NCX, NCXTags.ncx);
-//		serializer.writeNamespace("ncx", NAMESPACE_NCX);
-//		serializer.attribute("xmlns", NAMESPACE_NCX);
 		serializer.attribute(EpubWriter.EMPTY_NAMESPACE_PREFIX, NCXAttributes.version, NCXAttributeValues.version);
 		serializer.startTag(NAMESPACE_NCX, NCXTags.head);
 
-		for(Identifier identifier: identifiers) {
+		for (Identifier identifier : identifiers) {
 			writeMetaElement(identifier.getScheme(), identifier.getValue(), serializer);
 		}
 		
@@ -210,12 +191,11 @@ public class NCXDocument {
 		
 		serializer.startTag(NAMESPACE_NCX, NCXTags.docTitle);
 		serializer.startTag(NAMESPACE_NCX, NCXTags.text);
-		// write the first title
 		serializer.text(StringUtil.defaultIfNull(title));
 		serializer.endTag(NAMESPACE_NCX, NCXTags.text);
 		serializer.endTag(NAMESPACE_NCX, NCXTags.docTitle);
 		
-		for(Author author: authors) {
+		for (Author author : authors) {
 			serializer.startTag(NAMESPACE_NCX, NCXTags.docAuthor);
 			serializer.startTag(NAMESPACE_NCX, NCXTags.text);
 			serializer.text(author.getLastname() + ", " + author.getFirstname());
@@ -231,24 +211,22 @@ public class NCXDocument {
 		serializer.endDocument();
 	}
 
-
-	private static void writeMetaElement(String dtbName, String content, XmlSerializer serializer) throws IllegalArgumentException, IllegalStateException, IOException  {
+	private static void writeMetaElement(String dtbName, String content, XmlSerializer serializer) throws IllegalArgumentException, IllegalStateException, IOException {
 		serializer.startTag(NAMESPACE_NCX, NCXTags.meta);
 		serializer.attribute(EpubWriter.EMPTY_NAMESPACE_PREFIX, NCXAttributes.name, PREFIX_DTB + ":" + dtbName);
 		serializer.attribute(EpubWriter.EMPTY_NAMESPACE_PREFIX, NCXAttributes.content, content);
 		serializer.endTag(NAMESPACE_NCX, NCXTags.meta);
 	}
 	
-	private static int writeNavPoints(List<TOCReference> tocReferences, int playOrder,
-			XmlSerializer serializer) throws IllegalArgumentException, IllegalStateException, IOException  {
-		for(TOCReference tocReference: tocReferences) {
+	private static int writeNavPoints(List<TOCReference> tocReferences, int playOrder, XmlSerializer serializer) throws IllegalArgumentException, IllegalStateException, IOException {
+		for (TOCReference tocReference : tocReferences) {
 			if (tocReference.getResource() == null) {
 				playOrder = writeNavPoints(tocReference.getChildren(), playOrder, serializer);
 				continue;
 			}
 			writeNavPointStart(tocReference, playOrder, serializer);
 			playOrder++;
-			if(! tocReference.getChildren().isEmpty()) {
+			if (!tocReference.getChildren().isEmpty()) {
 				playOrder = writeNavPoints(tocReference.getChildren(), playOrder, serializer);
 			}
 			writeNavPointEnd(tocReference, serializer);
@@ -256,8 +234,7 @@ public class NCXDocument {
 		return playOrder;
 	}
 
-
-	private static void writeNavPointStart(TOCReference tocReference, int playOrder, XmlSerializer serializer) throws IllegalArgumentException, IllegalStateException, IOException  {
+	private static void writeNavPointStart(TOCReference tocReference, int playOrder, XmlSerializer serializer) throws IllegalArgumentException, IllegalStateException, IOException {
 		serializer.startTag(NAMESPACE_NCX, NCXTags.navPoint);
 		serializer.attribute(EpubWriter.EMPTY_NAMESPACE_PREFIX, NCXAttributes.id, "navPoint-" + playOrder);
 		serializer.attribute(EpubWriter.EMPTY_NAMESPACE_PREFIX, NCXAttributes.playOrder, String.valueOf(playOrder));
@@ -272,7 +249,7 @@ public class NCXDocument {
 		serializer.endTag(NAMESPACE_NCX, NCXTags.content);
 	}
 
-	private static void writeNavPointEnd(TOCReference tocReference, XmlSerializer serializer) throws IllegalArgumentException, IllegalStateException, IOException  {
+	private static void writeNavPointEnd(TOCReference tocReference, XmlSerializer serializer) throws IllegalArgumentException, IllegalStateException, IOException {
 		serializer.endTag(NAMESPACE_NCX, NCXTags.navPoint);
 	}
 }

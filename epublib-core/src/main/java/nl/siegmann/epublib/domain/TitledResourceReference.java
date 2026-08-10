@@ -1,11 +1,9 @@
 package nl.siegmann.epublib.domain;
 
-import java.io.Serializable;
-
 import nl.siegmann.epublib.Constants;
 import nl.siegmann.epublib.util.StringUtil;
 
-public class TitledResourceReference extends ResourceReference implements Serializable {
+public class TitledResourceReference extends ResourceReference {
 
 	/**
 	 * 

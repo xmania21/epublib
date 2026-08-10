@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.web.WebView?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<StackPane fx:id="rootPane"
+           xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="nl.siegmann.epublib.viewer.controller.ReaderController"
+           styleClass="reader-root">
+
+    <!-- Bottom Layer: Content Canvas -->
+    <WebView fx:id="webView" />
+
+    <!-- Overlay: Bottom Control Panel -->
+    <AnchorPane fx:id="controlPanelAnchor" pickOnBounds="false">
+        <fx:include fx:id="controlPanel" source="ControlPanel.fxml"
+                    AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+    </AnchorPane>
+
+    <!-- Overlay: TOC Drawer -->
+    <AnchorPane fx:id="tocAnchor" pickOnBounds="false">
+        <fx:include fx:id="toc" source="TocDrawer.fxml"
+                    AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+    </AnchorPane>
+
+    <!-- Overlay: Search Modal -->
+    <fx:include fx:id="searchModal" source="SearchModal.fxml" visible="false" />
+
+    <!-- Overlay: Global Settings Modal -->
+    <fx:include fx:id="settingsModal" source="LibrarySettingsModal.fxml" visible="false" />
+
+</StackPane>

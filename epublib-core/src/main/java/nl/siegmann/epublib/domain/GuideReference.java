@@ -1,7 +1,5 @@
 package nl.siegmann.epublib.domain;
 
-import java.io.Serializable;
-
 import nl.siegmann.epublib.util.StringUtil;
 
 
@@ -13,7 +11,7 @@ import nl.siegmann.epublib.util.StringUtil;
  * @author paul
  *
  */
-public class GuideReference extends TitledResourceReference implements Serializable {
+public class GuideReference extends TitledResourceReference {
 	
 	/**
 	 * 

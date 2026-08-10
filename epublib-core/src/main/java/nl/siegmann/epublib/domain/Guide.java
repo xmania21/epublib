@@ -3,6 +3,7 @@ package nl.siegmann.epublib.domain;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * The guide is a selection of special pages of the book.
@@ -112,12 +113,11 @@ public class Guide implements Serializable {
 	 * @return A list of all GuideReferences that have the given referenceTypeName (ignoring case).
 	 */
 	public List<GuideReference> getGuideReferencesByType(String referenceTypeName) {
-		List<GuideReference> result = new ArrayList<GuideReference>();
-		for (GuideReference guideReference: references) {
-			if (referenceTypeName.equalsIgnoreCase(guideReference.getType())) {
-				result.add(guideReference);
-			}
+		if (referenceTypeName == null) {
+			return new ArrayList<>();
 		}
-		return result;
+		return references.stream()
+				.filter(guideReference -> referenceTypeName.equalsIgnoreCase(guideReference.getType()))
+				.collect(Collectors.toList());
 	}
 }

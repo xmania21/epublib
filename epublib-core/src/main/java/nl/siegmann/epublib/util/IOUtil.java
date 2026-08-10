@@ -33,10 +33,10 @@ public class IOUtil {
 	 * @throws IOException
 	 */
 	public static byte[] toByteArray(InputStream in) throws IOException {
-		ByteArrayOutputStream result = new ByteArrayOutputStream();
-		copy(in, result);
-		result.flush();
-		return result.toByteArray();
+		if (in == null) {
+			return new byte[0];
+		}
+		return in.readAllBytes();
 	}
 
     /**

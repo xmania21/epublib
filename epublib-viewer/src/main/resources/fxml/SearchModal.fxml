@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.control.ProgressIndicator?>
+
+<StackPane fx:id="modalRoot" 
+           xmlns="http://javafx.com/javafx/21" 
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="nl.siegmann.epublib.viewer.controller.SearchModalController"
+           styleClass="search-modal-overlay"
+           pickOnBounds="true"
+           onMouseClicked="#onOverlayClicked">
+
+    <VBox fx:id="modalContent" styleClass="search-modal-content" maxWidth="600" maxHeight="500" spacing="15" StackPane.alignment="CENTER" onMouseClicked="#onContentClicked">
+        
+        <!-- Header / Search Input -->
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <Label text="Search Book" styleClass="search-modal-title" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button text="✕" onAction="#onClose" styleClass="icon-button-small" />
+        </HBox>
+        
+        <HBox alignment="CENTER" spacing="10" styleClass="search-modal-input-container">
+            <TextField fx:id="searchInput" promptText="Type to search..." HBox.hgrow="ALWAYS" styleClass="search-modal-input" onAction="#onSearchAction" />
+            <Button fx:id="searchBtn" text="🔍 Search" onAction="#onSearchAction" styleClass="search-modal-btn" />
+        </HBox>
+        
+        <!-- Results Area -->
+        <StackPane VBox.vgrow="ALWAYS">
+            <ListView fx:id="resultsListView" styleClass="search-modal-list" visible="false" />
+            
+            <VBox fx:id="loadingBox" alignment="CENTER" spacing="10" visible="false">
+                <ProgressIndicator />
+                <Label text="Searching..." styleClass="search-modal-status-text" />
+            </VBox>
+            
+            <VBox fx:id="emptyStateBox" alignment="CENTER" spacing="10">
+                <Label text="No results found." styleClass="search-modal-status-text" />
+            </VBox>
+        </StackPane>
+        
+    </VBox>
+</StackPane>

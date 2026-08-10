@@ -6,7 +6,6 @@ import java.util.Map;
 import nl.siegmann.epublib.domain.MediaType;
 import nl.siegmann.epublib.util.StringUtil;
 
-
 /**
  * Manages mediatypes that are used by epubs
  * 
@@ -45,14 +44,14 @@ public class MediatypeService {
 	public static final MediaType XPGT = new MediaType("application/adobe-page-template+xml", ".xpgt");
 	public static final MediaType PLS = new MediaType("application/pls+xml", ".pls");
 	
-	public static MediaType[] mediatypes = new MediaType[] {
+	public static final MediaType[] mediatypes = new MediaType[] {
 		XHTML, EPUB, JPG, PNG, GIF, CSS, SVG, TTF, NCX, XPGT, OPENTYPE, WOFF, SMIL, PLS, JAVASCRIPT, MP3, MP4, OGG
 	};
 	
-	public static Map<String, MediaType> mediaTypesByName = new HashMap<String, MediaType>();
+	public static final Map<String, MediaType> mediaTypesByName = new HashMap<>();
 	static {
-		for(int i = 0; i < mediatypes.length; i++) {
-			mediaTypesByName.put(mediatypes[i].getName(), mediatypes[i]);
+		for (MediaType mediaType : mediatypes) {
+			mediaTypesByName.put(mediaType.getName(), mediaType);
 		}
 	}
 	
@@ -62,15 +61,18 @@ public class MediatypeService {
 	
 	/**
 	 * Gets the MediaType based on the file extension.
-	 * Null of no matching extension found.
+	 * Null if no matching extension found.
 	 * 
 	 * @param filename
 	 * @return the MediaType based on the file extension.
 	 */
 	public static MediaType determineMediaType(String filename) {
-		for (MediaType mediaType: mediaTypesByName.values()) {
-			for(String extension: mediaType.getExtensions()) {
-				if(StringUtil.endsWithIgnoreCase(filename, extension)) {
+		if (StringUtil.isBlank(filename)) {
+			return null;
+		}
+		for (MediaType mediaType : mediaTypesByName.values()) {
+			for (String extension : mediaType.getExtensions()) {
+				if (StringUtil.endsWithIgnoreCase(filename, extension)) {
 					return mediaType;
 				}
 			}

@@ -2,21 +2,19 @@ package nl.siegmann.epublib.domain;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Objects;
 
 import nl.siegmann.epublib.epub.PackageDocumentBase;
 
 /**
  * A Date used by the book's metadata.
  * 
- * Examples: creation-date, modification-date, etc
- * 
  * @author paul
  *
  */
 public class Date implements Serializable {
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = 7533866830395120136L;
 
 	public enum Event {
@@ -31,18 +29,20 @@ public class Date implements Serializable {
 		}
 
 		public static Event fromValue(String v) {
-			for (Event c : Event.values()) {
-				if (c.value.equals(v)) {
-					return c;
-				}
+			if (v == null) {
+				return null;
 			}
-			return null;
+			return Arrays.stream(Event.values())
+					.filter(c -> c.value.equalsIgnoreCase(v))
+					.findFirst()
+					.orElse(null);
 		}
 		
+		@Override
 		public String toString() {
 			return value;
 		}
-	};
+	}
 
 	private Event event;
 	private String dateString;
@@ -73,15 +73,43 @@ public class Date implements Serializable {
 		this.dateString = dateString;
 	}
 
+	/**
+	 * Creates a Date with the given date string and event type.
+	 *
+	 * @param dateString the date string (e.g. {@code "2024-01-15"})
+	 * @param event      the event type
+	 * @return a new Date instance
+	 * @since 5.0
+	 */
+	public static Date of(String dateString, Event event) {
+		return new Date(dateString, event);
+	}
+
+	/**
+	 * Creates a Date with the given date string and event string.
+	 * The event string is matched case-insensitively against {@link Event} values.
+	 *
+	 * @param dateString the date string (e.g. {@code "2024-01-15"})
+	 * @param event      the event string (e.g. {@code "publication"})
+	 * @return a new Date instance
+	 * @since 5.0
+	 */
+	public static Date of(String dateString, String event) {
+		return new Date(dateString, event);
+	}
+
+
 	private static String checkDate(String dateString) {
 		if (dateString == null) {
 			throw new IllegalArgumentException("Cannot create a date from a blank string");
 		}
 		return dateString;
 	}
+
 	public String getValue() {
 		return dateString;
 	}
+
 	public Event getEvent() {
 		return event;
 	}
@@ -90,11 +118,25 @@ public class Date implements Serializable {
 		this.event = event;
 	}
 
-	public String toString() {
-		if (event == null) {
-			return dateString;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
 		}
-		return "" + event + ":" + dateString;
+		if (!(o instanceof Date other)) {
+			return false;
+		}
+		return event == other.event && Objects.equals(dateString, other.dateString);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(event, dateString);
+	}
+
+	@Override
+	public String toString() {
+		return event == null ? String.valueOf(dateString) : event + ":" + dateString;
 	}
 }
 
